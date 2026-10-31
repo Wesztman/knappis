@@ -1,6 +1,6 @@
 # Knappis
 
-*(that's Swedish for Buttony)*
+*Knappis, the little button*
 
 A friendly 2D browser game that teaches young children how to use a gamepad. Walk a little button-creature onto a symbol on the floor
 and press the matching button on the pad.

@@ -5,7 +5,7 @@
  */
 export const strings = {
   title: 'Knappis',
-  subtitle: '(eng: Buttony)',
+  subtitle: 'the little button',
   pressAnyButton: 'Press any button on your gamepad to start',
   orKeyboard: 'or press a key',
   nonXboxNotice:
