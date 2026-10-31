@@ -19,33 +19,44 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     scene.add.existing(this);
     this.setScale(scale);
 
+    // One smooth silhouette: body with two grips, drawn as a single path
+    // so nothing pokes out and the outline follows the whole shape.
+    const outline = new Phaser.Curves.Path(-80, -50);
+    outline.lineTo(80, -50);
+    outline.cubicBezierTo(115, 20, 120, -50, 128, -12);
+    outline.cubicBezierTo(75, 85, 108, 58, 100, 85);
+    outline.cubicBezierTo(45, 38, 52, 85, 45, 64);
+    outline.lineTo(-45, 38);
+    outline.cubicBezierTo(-75, 85, -45, 64, -52, 85);
+    outline.cubicBezierTo(-115, 20, -100, 85, -108, 58);
+    outline.cubicBezierTo(-80, -50, -128, -12, -120, -50);
+    const points = outline.getPoints(96);
+
     const body = scene.add.graphics();
     body.fillStyle(0x4a4a52, 1);
-    body.fillRoundedRect(-120, -45, 240, 90, 40);
-    body.fillEllipse(-85, 30, 70, 90);
-    body.fillEllipse(85, 30, 70, 90);
+    body.fillPoints(points, true);
     body.lineStyle(5, 0x2b2b30, 1);
-    body.strokeRoundedRect(-120, -45, 240, 90, 40);
+    body.strokePoints(points, true);
     this.add(body);
 
     const details = scene.add.graphics();
     details.fillStyle(0x2b2b30, 1);
-    details.fillCircle(-70, -8, 22); // left stick well
+    details.fillCircle(-78, -10, 21); // left stick well
     details.fillStyle(0x6e6e78, 1);
-    details.fillCircle(-70, -8, 15); // left stick cap
+    details.fillCircle(-78, -10, 14); // left stick cap
     details.fillStyle(0x2b2b30, 1);
-    details.fillRoundedRect(-42, 14, 14, 42, 4); // d-pad vertical
-    details.fillRoundedRect(-56, 28, 42, 14, 4); // d-pad horizontal
-    details.fillCircle(40, 32, 15); // right stick well
+    details.fillRoundedRect(-37, -6, 14, 40, 4); // d-pad vertical
+    details.fillRoundedRect(-50, 7, 40, 14, 4); // d-pad horizontal
+    details.fillCircle(30, 16, 13); // right stick well
     details.fillStyle(0x6e6e78, 1);
-    details.fillCircle(40, 32, 10);
+    details.fillCircle(30, 16, 9);
     this.add(details);
 
-    this.glow = scene.add.circle(0, 0, 22, 0xffffff, 0.9).setVisible(false);
+    this.glow = scene.add.circle(0, 0, 17, 0xffffff, 0.9).setVisible(false);
     this.add(this.glow);
 
-    const spread = 24;
-    const centre = { x: 72, y: -8 };
+    const spread = 23;
+    const centre = { x: 74, y: -6 };
     this.buttonNodes = {} as Record<FaceButton, Phaser.GameObjects.Container>;
     for (const face of FACE_BUTTONS) {
       const off = theme.layout[face];
@@ -84,7 +95,7 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     this.bringToTop(node);
     this.pulse = this.scene.tweens.add({
       targets: [node, this.glow],
-      scale: { from: 1, to: 1.35 },
+      scale: { from: 1, to: 1.2 },
       duration: 420,
       yoyo: true,
       repeat: -1,
