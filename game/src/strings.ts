@@ -5,7 +5,6 @@
  */
 export const strings = {
   title: 'Knappis',
-  tagline: "(that's Swedish for Buttony)",
   pressAnyButton: 'Press any button on your gamepad to start',
   orKeyboard: 'or press a key',
   nonXboxNotice:
