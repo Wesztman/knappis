@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { Sounds } from '../audio/Sounds';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { setDebug } from '../debug';
-import { FACE_BUTTONS } from '../input/buttons';
+import { classifyGamepad, FACE_BUTTONS } from '../input/buttons';
 import { InputService } from '../input/InputService';
 import { setupCamera } from '../render';
 import { strings } from '../strings';
@@ -19,6 +19,7 @@ export class ConnectScene extends Phaser.Scene {
   private input2!: InputService;
   private diagram!: GamepadDiagram;
   private notice!: Phaser.GameObjects.Text;
+  private padStatus!: Phaser.GameObjects.Text;
   private sounds!: Sounds;
   private starting = false;
   private cycleIndex = 0;
@@ -52,10 +53,19 @@ export class ConnectScene extends Phaser.Scene {
 
     addText(this, GAME_WIDTH / 2, 520, strings.pressAnyButton, { fontSize: '34px' });
     addText(this, GAME_WIDTH / 2, 570, strings.orKeyboard, { fontSize: '24px', color: '#7a6a60' });
-    addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 40, strings.keyboardHelp, {
+    addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 30, strings.keyboardHelp, {
       fontSize: '20px',
       color: '#9a8a80',
     });
+
+    // Live readout of what the browser itself reports, independent of Phaser.
+    // Doubles as the debugging tool promised in the design doc.
+    this.padStatus = addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 68, '', {
+      fontSize: '20px',
+      color: '#9a8a80',
+    });
+    this.time.addEvent({ delay: 250, loop: true, callback: () => this.refreshPadStatus() });
+    this.refreshPadStatus();
 
     this.notice = addText(this, GAME_WIDTH / 2, 640, strings.nonXboxNotice, {
       fontSize: '26px',
@@ -72,6 +82,23 @@ export class ConnectScene extends Phaser.Scene {
     setDebug({ scene: 'Connect' });
     // Lets the Playwright smoke test know Phaser finished booting.
     this.game.canvas.dataset.ready = 'true';
+  }
+
+  private refreshPadStatus(): void {
+    if (!window.isSecureContext) {
+      this.padStatus.setText(strings.padInsecure).setColor('#b3261e');
+      return;
+    }
+    const pads = typeof navigator.getGamepads === 'function' ? navigator.getGamepads() : [];
+    const live = Array.from(pads).find((p) => p && p.connected);
+    if (!live) {
+      this.padStatus.setText(strings.padNone).setColor('#9a8a80');
+      return;
+    }
+    const kind = classifyGamepad(live.id, live.mapping);
+    this.padStatus
+      .setText(`${strings.padSeen}${live.id}${kind === 'xbox' ? '' : ' (not Xbox-style)'}`)
+      .setColor(kind === 'xbox' ? '#3c8c4a' : '#b3261e');
   }
 
   private cycleHighlight(): void {

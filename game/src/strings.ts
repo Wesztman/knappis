@@ -12,4 +12,8 @@ export const strings = {
     'Only Xbox-style gamepads are supported right now. The pictures may not match this one.',
   clickForSound: 'Click the screen for sound',
   keyboardHelp: 'Keyboard: arrow keys walk, A B X Y press',
+  padNone: 'No gamepad seen yet. Press a button on it while this window is focused.',
+  padSeen: 'Gamepad: ',
+  padInsecure:
+    'Gamepads only work on http://localhost or https. Open http://localhost:5173 instead.',
 };

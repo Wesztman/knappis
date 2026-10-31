@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import {
   classifyGamepad,
+  DPAD_INDEX,
   FACE_BUTTONS,
   STANDARD_BUTTON_INDEX,
   type FaceButton,
@@ -28,6 +29,10 @@ export interface InputFrame {
 /**
  * One place that reads the gamepad and keyboard and turns them into a
  * simple per-frame snapshot. Scenes never touch Phaser input directly.
+ *
+ * The gamepad is read straight from the browser's Gamepad API rather than
+ * through Phaser's gamepad plugin: we only need the standard mapping, and
+ * going direct removes a layer that has had timing quirks across browsers.
  *
  * Keyboard fallback: arrow keys move, the letters A/B/X/Y press the
  * matching face button.
@@ -57,18 +62,19 @@ export class InputService {
       : [];
   }
 
-  /** The first connected gamepad, if any. */
-  get pad(): Phaser.Input.Gamepad.Gamepad | null {
-    const plugin = this.scene.input.gamepad;
-    if (!plugin || plugin.total === 0) return null;
-    return plugin.getPad(0) ?? null;
+  /** The first connected gamepad, if any, straight from the browser. */
+  get pad(): Gamepad | null {
+    if (typeof navigator.getGamepads !== 'function') return null;
+    for (const p of navigator.getGamepads()) {
+      if (p && p.connected) return p;
+    }
+    return null;
   }
 
   padInfo(): PadInfo | null {
     const pad = this.pad;
     if (!pad) return null;
-    const mapping = (pad.pad as Gamepad | undefined)?.mapping ?? '';
-    return { id: pad.id, kind: classifyGamepad(pad.id, mapping) };
+    return { id: pad.id, kind: classifyGamepad(pad.id, pad.mapping) };
   }
 
   /** Call once per frame. */
@@ -82,12 +88,11 @@ export class InputService {
     let stick: Vec2 = { x: 0, y: 0 };
     let dpad: Vec2 = { x: 0, y: 0 };
     if (pad) {
-      const ax = pad.axes[0]?.value ?? 0;
-      const ay = pad.axes[1]?.value ?? 0;
-      stick = applyDeadZone(ax, ay);
+      stick = applyDeadZone(pad.axes[0] ?? 0, pad.axes[1] ?? 0);
+      const down = (i: number) => pad.buttons[i]?.pressed ?? false;
       dpad = {
-        x: (pad.right ? 1 : 0) - (pad.left ? 1 : 0),
-        y: (pad.down ? 1 : 0) - (pad.up ? 1 : 0),
+        x: (down(DPAD_INDEX.right) ? 1 : 0) - (down(DPAD_INDEX.left) ? 1 : 0),
+        y: (down(DPAD_INDEX.down) ? 1 : 0) - (down(DPAD_INDEX.up) ? 1 : 0),
       };
 
       const now = new Set<number>();

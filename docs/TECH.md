@@ -67,9 +67,13 @@ interesting logic testable and lets the rendering be swapped later.
 - **Xbox-style only for now.** Detect via `pad.id` / mapping === "standard";
   anything else gets a notice (see `docs/DESIGN.md#supported-gamepads`).
 
-- Phaser's Gamepad plugin exposes `pad.leftStick`, `pad.A/B/X/Y` and
-  `pad.buttons[i]`. Standard mapping indices: A=0, B=1, X=2, Y=3, LB=4,
+- The gamepad is read directly from `navigator.getGamepads()` each frame in
+  `InputService`, not via Phaser's gamepad plugin (fewer moving parts, no
+  timestamp quirks). Standard mapping indices: A=0, B=1, X=2, Y=3, LB=4,
   RB=5, LT=6, RT=7, D-pad up/down/left/right = 12/13/14/15.
+- The Gamepad API needs a secure context: `http://localhost` is fine, a raw
+  IP such as `http://172.x.x.x:5173` is not. The Connect screen shows a
+  warning in that case.
 - Browsers only expose a gamepad after the user presses something on it.
   The Connect scene exists partly for that reason.
 - Dead zone ≈ 0.25 and movement speed low (~120 px/s on a 1280×720 canvas).

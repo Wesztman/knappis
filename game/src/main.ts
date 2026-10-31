@@ -18,9 +18,6 @@ const config: Phaser.Types.Core.GameConfig = {
   render: {
     antialias: true,
   },
-  input: {
-    gamepad: true,
-  },
   scene: [BootScene, ConnectScene, PlayScene],
 };
 
