@@ -5,8 +5,7 @@
 
 ## One-line pitch
 
-A calm, friendly 2D game that teaches children aged roughly 3–6 how to use a
-hand controller: move with the stick, then press the button that matches the
+A calm, friendly 2D game that teaches young children how to use a gamepad: move with the stick, then press the button that matches the
 symbol you are standing on.
 
 ## Who it is for
@@ -23,7 +22,7 @@ symbol you are standing on.
 2. **One idea at a time.** Each mode introduces exactly one new input.
 3. **Big, slow, readable.** Large avatar, slow movement, high-contrast
    symbols, no small text. Nothing requires reading.
-4. **The controller is on screen.** A drawing of the pad shows which button
+4. **The gamepad is on screen.** A drawing of the pad shows which button
    lit up. Borrowed from Astro's Playroom. This also makes debugging easy.
 5. **No timers by default.** Pressure is an opt-in setting for older kids.
 6. **Short sessions.** A round is 1–3 minutes. Quitting is always fine.
@@ -31,7 +30,7 @@ symbol you are standing on.
 ## Core loop (Mode 1: "Hitta knappen" / Find the button)
 
 1. Knappis stands in a bounded room (one screen, no scrolling).
-2. Four floor tiles each show a controller symbol (Xbox: A green, B red,
+2. Four floor tiles each show a gamepad symbol (Xbox: A green, B red,
    X blue, Y yellow).
 3. One tile is "asked for": it pulses, and the on-screen pad lights that
    button. Optionally a voice says the colour/letter.
@@ -46,12 +45,32 @@ symbol you are standing on.
 6. After N stars (default 5) a short "round complete" dance plays, then the
    next round starts with a shuffled tile layout.
 
-## Controller mapping
+## Supported gamepads
 
-- **Primary target: Xbox-style pad** (A/B/X/Y, colour-coded; Windows
-  recognises it without drivers).
-- Symbol set is a swappable theme so PlayStation shapes (×, ○, □, △) or
-  Nintendo (B/A/Y/X) can be added later.
+**Only Xbox-style gamepads are supported right now.** That means the Xbox
+wireless controller and anything that presents itself as one (most PC pads
+in "XInput" mode).
+
+Why only Xbox for now:
+
+- **Windows and browsers treat it as the default.** Windows recognises it
+  without drivers, and the browser Gamepad API reports it with the
+  "standard" mapping, so button indices are predictable.
+- **The symbols are already on the buttons.** A/B/X/Y are colour-coded
+  letters, which gives a child two cues (colour and letter) without the game
+  having to invent its own icon set.
+- **One pad means one set of on-screen pictures.** The on-screen gamepad
+  drawing, the floor symbols and the hints all have to match what is in the
+  child's hands. Supporting several layouts before the core loop is fun
+  would multiply the work and the testing.
+- **It is what we have at home to test with.**
+
+PlayStation (×, ○, □, △) and Nintendo (B/A/Y/X, swapped positions) differ in
+both symbols and button order. The symbol set is designed as a swappable
+theme so these can be added later without touching the game rules. Until
+then, a non-Xbox pad may work for movement but the pictures will be wrong.
+
+## Gamepad mapping
 - Movement: left stick **and** D-pad both work; whichever the child grabs.
 - Dead zone generous (≈0.25) because small thumbs rest on the stick.
 - Keyboard fallback (arrows + Z/X/C/V) so the game is testable without a pad
@@ -81,7 +100,7 @@ symbol you are standing on.
 - Colour **and** letter/shape on every symbol (not colour alone).
 - Setting to slow movement further.
 - Setting to require holding the button briefly (avoids accidental taps).
-- Everything reachable with one hand on the controller.
+- Everything reachable with one hand on the gamepad.
 
 ## Non-goals (for now)
 

@@ -17,14 +17,15 @@ they land. Keep this file honest: if a milestone changes, edit it here.
       and keyboard arrows, with dead zone
 - [ ] Movement clamped to the room bounds
 - [ ] Walk bounce animation
-- [ ] "Connect your controller" overlay shown until a pad is detected
+- [ ] "Connect your gamepad" overlay shown until a pad is detected
+- [ ] Non-Xbox pad detected → friendly notice that only Xbox-style is supported
       (keyboard dismisses it)
 
 ## M2 – Core loop
 - [ ] Four symbol tiles placed in the room (Xbox theme)
 - [ ] Standing on a tile highlights it + soft sound
 - [ ] One tile is "asked for" and pulses
-- [ ] On-screen controller drawing with the asked-for button lit
+- [ ] On-screen gamepad drawing with the asked-for button lit
 - [ ] Correct press → celebration (particles, jingle, star added)
 - [ ] Wrong press → gentle wobble, hint repeats
 - [ ] 5 stars → round complete dance → reshuffle tiles
@@ -33,7 +34,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 ## M3 – Polish for real kids
 - [ ] Sound effects (generated or CC0)
 - [ ] Settings scene: movement speed, hold-to-press, timer on/off
-- [ ] Symbol theme switch (Xbox / PlayStation)
+- [ ] Symbol theme switch (Xbox / PlayStation) – first non-Xbox support
 - [ ] Playtest with an actual child; write findings in `docs/PLAYTESTS.md`
 
 ## M4 – More modes

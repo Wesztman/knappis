@@ -16,9 +16,9 @@
 
 Development happens in WSL2 (Linux). The game is played in the Windows
 browser at `http://localhost:5173`. The Gamepad API runs in the Windows
-browser, so controller input works without any USB passthrough into WSL.
+browser, so gamepad input works without any USB passthrough into WSL.
 A desktop engine (Godot, Unity) running inside WSL would have made
-controller testing painful.
+gamepad testing painful.
 
 ## Architecture sketch
 
@@ -29,7 +29,7 @@ game/
     main.ts              # Phaser.Game config + scene list
     scenes/
       BootScene.ts       # generate placeholder textures, load audio
-      ConnectScene.ts    # "press any button" controller detection
+      ConnectScene.ts    # "press any button" gamepad detection
       PlayScene.ts       # the room: avatar, tiles, HUD
       SettingsScene.ts
     input/
@@ -39,7 +39,7 @@ game/
       FindTheButton.ts   # pure state machine for Mode 1 (unit-tested)
       types.ts
     ui/
-      ControllerDiagram.ts  # on-screen pad with highlightable buttons
+      GamepadDiagram.ts     # on-screen pad with highlightable buttons
       StarRow.ts
     themes/
       xbox.ts            # colours, labels for A/B/X/Y
@@ -56,6 +56,9 @@ into the rules object, and render whatever state comes back. This keeps the
 interesting logic testable and lets the rendering be swapped later.
 
 ## Input handling notes
+
+- **Xbox-style only for now.** Detect via `pad.id` / mapping === "standard";
+  anything else gets a notice (see `docs/DESIGN.md#supported-gamepads`).
 
 - Phaser's Gamepad plugin exposes `pad.leftStick`, `pad.A/B/X/Y` and
   `pad.buttons[i]`. Standard mapping indices: A=0, B=1, X=2, Y=3, LB=4,
