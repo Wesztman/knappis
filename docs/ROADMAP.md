@@ -3,13 +3,13 @@
 Each milestone ends with something playable in the browser. Tick boxes as
 they land. Keep this file honest: if a milestone changes, edit it here.
 
-## M0 – Project skeleton
-- [ ] Vite + TypeScript + Phaser 3 project in `game/`
-- [ ] `npm run dev` serves on `0.0.0.0` so the Windows browser can reach WSL
-- [ ] Blank Phaser scene renders a coloured background and "Knappis" text
-- [ ] ESLint + Prettier, `npm run check` (typecheck + lint)
-- [ ] Vitest wired up with one trivial test
-- [ ] Playwright smoke test: page loads, no console errors, canvas present
+## M0 – Project skeleton ✅
+- [x] Vite + TypeScript + Phaser 3 project in `game/`
+- [x] `npm run dev` serves on `0.0.0.0` so the Windows browser can reach WSL
+- [x] Blank Phaser scene renders a coloured background and "Knappis" text
+- [x] ESLint + Prettier, `npm run check` (typecheck + lint + format + unit tests)
+- [x] Vitest wired up with one trivial test
+- [x] Playwright smoke test: page loads, no console errors, canvas present
 
 ## M1 – Walk around
 - [ ] Knappis avatar drawn with Phaser graphics (circle + eyes + legs)
