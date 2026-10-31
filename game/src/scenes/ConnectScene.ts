@@ -33,8 +33,18 @@ export class ConnectScene extends Phaser.Scene {
     this.sounds = (this.registry.get('sounds') as Sounds | undefined) ?? new Sounds();
     this.registry.set('sounds', this.sounds);
 
-    addText(this, GAME_WIDTH / 2, 140, strings.title, { fontSize: '120px', fontStyle: 'bold' });
-    addText(this, GAME_WIDTH / 2, 215, strings.subtitle, { fontSize: '20px', color: '#9a8a80' });
+    addText(this, GAME_WIDTH / 2, 125, strings.title, { fontSize: '120px', fontStyle: 'bold' });
+    const subtitle = addText(this, GAME_WIDTH / 2, 232, strings.subtitle, {
+      fontSize: '26px',
+      fontStyle: 'italic',
+      color: '#a3886a',
+      letterSpacing: 3,
+    });
+    const rules = this.add.graphics();
+    rules.lineStyle(2, 0xd9bf8c, 1);
+    const gap = subtitle.width / 2 + 22;
+    rules.lineBetween(GAME_WIDTH / 2 - gap - 70, 232, GAME_WIDTH / 2 - gap, 232);
+    rules.lineBetween(GAME_WIDTH / 2 + gap, 232, GAME_WIDTH / 2 + gap + 70, 232);
 
     this.diagram = new GamepadDiagram(this, GAME_WIDTH / 2, 360, xboxTheme, 1.6);
     this.time.addEvent({ delay: 500, loop: true, callback: () => this.cycleHighlight() });
