@@ -69,8 +69,17 @@ interesting logic testable and lets the rendering be swapped later.
 - Edge-detect button presses (down this frame, not held) so a long press
   counts once.
 
+## Rendering on high-DPI screens
+
+The game is designed in 1280×720 units, but the canvas is created at the
+physical pixel size of the window (`src/render.ts`). Each scene calls
+`setupCamera(this)` which zooms the camera by `RENDER_SCALE` so game code
+still thinks in 1280×720. Text uses `CRISP_TEXT` so glyphs are rasterised
+at full resolution. Without this, Windows display scaling (125–150 %) makes
+everything blurry.
+
 ## Conventions
 
-- Canvas 1280×720, scaled to fit the window (`Phaser.Scale.FIT`).
+- Game coordinates 1280×720, scaled to fit the window (`Phaser.Scale.FIT`).
 - All user-facing strings live in one file; no text is required to play.
 - Commit small and often; messages in English.

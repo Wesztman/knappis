@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config';
+import { CRISP_TEXT, setupCamera } from '../render';
 
 /**
  * First scene. For M0 it just proves the pipeline works: a coloured room
@@ -12,8 +13,11 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    setupCamera(this);
+
     this.add
       .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'Knappis', {
+        ...CRISP_TEXT,
         fontFamily: 'Arial Rounded MT Bold, Arial, sans-serif',
         fontSize: '96px',
         color: '#3a2e2a',
