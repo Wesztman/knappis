@@ -1,31 +1,24 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH } from '../config';
-import { CRISP_TEXT, setupCamera } from '../render';
 
-/**
- * First scene. For M0 it just proves the pipeline works: a coloured room
- * and the game's name. Later it will generate placeholder textures and
- * hand over to the Connect scene.
- */
+/** Generates the few textures the game needs, then hands over. */
 export class BootScene extends Phaser.Scene {
   constructor() {
     super('Boot');
   }
 
   create(): void {
-    setupCamera(this);
+    const dot = this.make.graphics({ x: 0, y: 0 }, false);
+    dot.fillStyle(0xffffff, 1);
+    dot.fillCircle(8, 8, 8);
+    dot.generateTexture('dot', 16, 16);
+    dot.destroy();
 
-    this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'Knappis', {
-        ...CRISP_TEXT,
-        fontFamily: 'Arial Rounded MT Bold, Arial, sans-serif',
-        fontSize: '96px',
-        color: '#3a2e2a',
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5);
+    const spark = this.make.graphics({ x: 0, y: 0 }, false);
+    spark.fillStyle(0xffffff, 1);
+    spark.fillRoundedRect(0, 0, 14, 22, 4);
+    spark.generateTexture('confetti', 14, 22);
+    spark.destroy();
 
-    // Lets the Playwright smoke test know Phaser finished booting.
-    this.game.canvas.dataset.ready = 'true';
+    this.scene.start('Connect');
   }
 }

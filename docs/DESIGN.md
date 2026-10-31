@@ -73,8 +73,8 @@ then, a non-Xbox pad may work for movement but the pictures will be wrong.
 ## Gamepad mapping
 - Movement: left stick **and** D-pad both work; whichever the child grabs.
 - Dead zone generous (≈0.25) because small thumbs rest on the stick.
-- Keyboard fallback (arrows + Z/X/C/V) so the game is testable without a pad
-  and playable in a pinch.
+- Keyboard fallback (arrow keys move, the letters A/B/X/Y press) so the game
+  is testable without a pad and playable in a pinch.
 
 ## Progression of modes (later)
 

@@ -38,17 +38,24 @@ game/
     rules/
       FindTheButton.ts   # pure state machine for Mode 1 (unit-tested)
       types.ts
+    entities/
+      Knappis.ts         # the character, drawn in code
     ui/
-      GamepadDiagram.ts     # on-screen pad with highlightable buttons
+      GamepadDiagram.ts  # on-screen pad with highlightable buttons
+      Tile.ts            # floor tile that looks like a giant face button
       StarRow.ts
     themes/
       xbox.ts            # colours, labels for A/B/X/Y
       playstation.ts
     audio/
-      Sounds.ts          # thin wrapper; placeholder tones via WebAudio
+      Sounds.ts          # placeholder tones via WebAudio
+    debug.ts             # window.__knappis hooks for e2e tests (dev only)
+    strings.ts           # all user-facing text (Swedish)
   tests/
-    rules/FindTheButton.test.ts
+    unit/rules/FindTheButton.test.ts
+    unit/input/*.test.ts
     e2e/smoke.spec.ts
+    e2e/gameplay.spec.ts
 ```
 
 Guiding rule: **game rules never import Phaser.** Scenes read input, call
@@ -68,6 +75,14 @@ interesting logic testable and lets the rendering be swapped later.
 - Dead zone ≈ 0.25 and movement speed low (~120 px/s on a 1280×720 canvas).
 - Edge-detect button presses (down this frame, not held) so a long press
   counts once.
+- Keyboard fallback: arrow keys move, letters A/B/X/Y press. Enter/Space
+  also count as "any button" on the Connect screen.
+- Audio can only start after a click or key press (browser autoplay rules);
+  gamepad presses do not count. `Sounds.unlock()` is called on those events
+  and the Play scene shows a "click for sound" hint until it succeeds.
+- Headless Chromium (Playwright) runs at a low frame rate, so e2e tests use
+  the `window.__knappis` debug hooks (dev builds only) to teleport and read
+  state instead of timing key holds.
 
 ## Rendering on high-DPI screens
 
