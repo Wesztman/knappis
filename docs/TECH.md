@@ -50,7 +50,7 @@ game/
     audio/
       Sounds.ts          # placeholder tones via WebAudio
     debug.ts             # window.__knappis hooks for e2e tests (dev only)
-    strings.ts           # all user-facing text (Swedish)
+    strings.ts           # all user-facing text (English; name stays Swedish)
   tests/
     unit/rules/FindTheButton.test.ts
     unit/input/*.test.ts
@@ -96,5 +96,6 @@ everything blurry.
 ## Conventions
 
 - Game coordinates 1280×720, scaled to fit the window (`Phaser.Scale.FIT`).
-- All user-facing strings live in one file; no text is required to play.
+- All user-facing strings live in one file, in English; no text is required to
+  play. The name Knappis stays Swedish.
 - Commit small and often; messages in English.
