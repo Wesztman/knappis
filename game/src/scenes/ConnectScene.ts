@@ -33,7 +33,8 @@ export class ConnectScene extends Phaser.Scene {
     this.sounds = (this.registry.get('sounds') as Sounds | undefined) ?? new Sounds();
     this.registry.set('sounds', this.sounds);
 
-    addText(this, GAME_WIDTH / 2, 150, strings.title, { fontSize: '120px', fontStyle: 'bold' });
+    addText(this, GAME_WIDTH / 2, 140, strings.title, { fontSize: '120px', fontStyle: 'bold' });
+    addText(this, GAME_WIDTH / 2, 215, strings.subtitle, { fontSize: '20px', color: '#9a8a80' });
 
     this.diagram = new GamepadDiagram(this, GAME_WIDTH / 2, 360, xboxTheme, 1.6);
     this.time.addEvent({ delay: 500, loop: true, callback: () => this.cycleHighlight() });
