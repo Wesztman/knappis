@@ -3,17 +3,20 @@ import type { FaceButton } from '../input/buttons';
 import { FACE_BUTTONS } from '../input/buttons';
 import type { SymbolTheme } from '../themes/types';
 import { addText } from '../text';
+import { FACE_CENTRE, FACE_SPREAD, GAMEPAD_SILHOUETTE } from './gamepadSilhouette';
 
 /** Which part of the pad the child should use next. */
 export type Step = 'move' | 'press';
 
-/** Positions in the pad's local space, traced from an Xbox Series controller. */
-const STICK = { x: -72, y: -47 };
-const RIGHT_STICK = { x: 37, y: -6 };
-const DPAD = { x: -38, y: -2 };
-const FACE_CENTRE = { x: 72, y: -46 };
-const FACE_SPREAD = 23;
-const FACE_RADIUS = 13;
+/**
+ * Positions in the pad's local space (256 wide, centred), measured from the
+ * same photo the silhouette was traced from. The left stick mirrors the
+ * face-button cluster; the D-pad and right stick sit lower, nearer the middle.
+ */
+const STICK = { x: -66, y: -40.5 };
+const RIGHT_STICK = { x: 34.5, y: -2 };
+const DPAD = { x: -35, y: 1.5 };
+const FACE_RADIUS = 10;
 /** How far the drawn stick cap travels at full deflection. */
 const STICK_TRAVEL = 6;
 
@@ -44,69 +47,50 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     scene.add.existing(this);
     this.setScale(scale);
 
-    // Bumpers peek out above the shoulders, tilted to follow their slope.
-    for (const side of [-1, 1]) {
-      const bumper = scene.add.graphics({ x: side * 60, y: -85 });
-      bumper.fillStyle(BODY_EDGE, 1);
-      bumper.fillRoundedRect(-32, -9, 64, 18, 8);
-      bumper.setRotation(side * 0.1);
-      this.add(bumper);
-    }
-
-    // One smooth silhouette traced from the real controller: wide
-    // shoulders, long grips angled outward, a rounded crotch between them.
-    // Traced from a straight-on photo of the Series controller: tall body,
-    // outer edges that stay wide low down, stubby grips pointing down-and-out.
-    const outline = new Phaser.Curves.Path(-48, -84);
-    outline.lineTo(48, -84);
-    outline.cubicBezierTo(128, -7, 100, -84, 128, -50);
-    outline.cubicBezierTo(82, 86, 126, 40, 100, 72);
-    outline.cubicBezierTo(48, 88, 72, 100, 56, 100);
-    outline.cubicBezierTo(0, 40, 34, 64, 8, 40);
-    outline.cubicBezierTo(-48, 88, -8, 40, -34, 64);
-    outline.cubicBezierTo(-82, 86, -56, 100, -72, 100);
-    outline.cubicBezierTo(-128, -7, -100, 72, -126, 40);
-    outline.cubicBezierTo(-48, -84, -128, -50, -100, -84);
-    const points = outline.getPoints(120);
-
+    // Silhouette traced from a photo of the real controller (bumpers included).
+    const points = GAMEPAD_SILHOUETTE.map(([x, y]) => new Phaser.Math.Vector2(x, y));
     const body = scene.add.graphics();
     body.fillStyle(BODY, 1);
     body.fillPoints(points, true);
     body.lineStyle(4, BODY_EDGE, 1);
     body.strokePoints(points, true);
+    // A faint line where the bumpers meet the body, so the top reads as bumpers.
+    body.lineStyle(2, BODY_EDGE, 0.7);
+    body.lineBetween(-84, -72, -38, -84);
+    body.lineBetween(38, -84, 84, -72);
     this.add(body);
 
-    this.stickGlow = scene.add.circle(STICK.x, STICK.y, 25, 0xffffff, 0.9).setVisible(false);
+    this.stickGlow = scene.add.circle(STICK.x, STICK.y, 23, 0xffffff, 0.9).setVisible(false);
     this.add(this.stickGlow);
 
     const details = scene.add.graphics();
     // Left stick well
     details.fillStyle(WELL, 1);
-    details.fillCircle(STICK.x, STICK.y, 19);
+    details.fillCircle(STICK.x, STICK.y, 17);
     // Right stick
-    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 19);
+    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 17);
     details.fillStyle(CAP, 1);
-    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 13);
+    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 12);
     details.lineStyle(2, CAP_EDGE, 1);
-    details.strokeCircle(RIGHT_STICK.x, RIGHT_STICK.y, 13);
+    details.strokeCircle(RIGHT_STICK.x, RIGHT_STICK.y, 12);
     // D-pad: round dish with a cross
     details.fillStyle(WELL, 1);
-    details.fillCircle(DPAD.x, DPAD.y, 20);
+    details.fillCircle(DPAD.x, DPAD.y, 18);
     details.fillStyle(CAP, 1);
-    details.fillRoundedRect(DPAD.x - 6, DPAD.y - 16, 12, 32, 3);
-    details.fillRoundedRect(DPAD.x - 16, DPAD.y - 6, 32, 12, 3);
+    details.fillRoundedRect(DPAD.x - 5, DPAD.y - 14, 10, 28, 3);
+    details.fillRoundedRect(DPAD.x - 14, DPAD.y - 5, 28, 10, 3);
     // Round button at the top centre, and the three small centre buttons
     details.fillStyle(CAP, 1);
-    details.fillCircle(0, -70, 10);
+    details.fillCircle(0, -67, 9);
     details.lineStyle(2, CAP_EDGE, 1);
-    details.strokeCircle(0, -70, 10);
+    details.strokeCircle(0, -67, 9);
     details.fillStyle(CAP, 1);
-    details.fillCircle(-20, -47, 5);
-    details.fillCircle(20, -47, 5);
-    details.fillCircle(0, -32, 5);
+    details.fillCircle(-19, -40.5, 4.5);
+    details.fillCircle(19, -40.5, 4.5);
+    details.fillCircle(0, -26, 4.5);
     this.add(details);
 
-    this.stickCap = scene.add.circle(STICK.x, STICK.y, 13, CAP);
+    this.stickCap = scene.add.circle(STICK.x, STICK.y, 12, CAP);
     this.stickCap.setStrokeStyle(2, CAP_EDGE, 1);
     this.add(this.stickCap);
 
@@ -124,7 +108,7 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
       node.add(scene.add.circle(0, 0, FACE_RADIUS, 0x141416));
       node.add(
         addText(scene, 0, 1, style.label, {
-          fontSize: '17px',
+          fontSize: '14px',
           fontStyle: 'bold',
           color: style.colourCss,
         }),

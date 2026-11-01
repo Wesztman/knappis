@@ -97,6 +97,18 @@ still thinks in 1280×720. Text uses `CRISP_TEXT` so glyphs are rasterised
 at full resolution. Without this, Windows display scaling (125–150 %) makes
 everything blurry.
 
+## Gamepad drawing
+
+`GamepadDiagram` draws the pad from `gamepadSilhouette.ts`, an outline traced
+from a straight-on photo of an Xbox Series controller with
+`tools/trace-silhouette.cjs` (headless Chromium thresholds the photo and
+reads the per-column top/bottom edges, plus the centroids of the coloured
+letters for the face-button positions). To re-trace from a new photo:
+
+```bash
+cd game && NODE_PATH=node_modules node ../tools/trace-silhouette.cjs photo.png
+```
+
 ## Conventions
 
 - Game coordinates 1280×720, scaled to fit the window (`Phaser.Scale.FIT`).

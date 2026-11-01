@@ -132,7 +132,7 @@ export class PlayScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    this.diagram = new GamepadDiagram(this, GAME_WIDTH - 125, HUD_HEIGHT / 2 + 5, this.theme, 0.64);
+    this.diagram = new GamepadDiagram(this, GAME_WIDTH - 120, HUD_HEIGHT / 2, this.theme, 0.8);
 
     this.soundHint = addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 24, strings.clickForSound, {
       fontSize: '20px',
