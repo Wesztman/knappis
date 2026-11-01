@@ -173,6 +173,13 @@ export class PlayScene extends Phaser.Scene {
 
     this.updateStanding();
 
+    // Teach in two steps: pulse the stick until Knappis is on the right
+    // tile, then pulse the button.
+    this.diagram.setStick(frame.move.x, frame.move.y);
+    if (!this.animating && this.rules.state.phase === 'playing') {
+      this.diagram.setStep(this.standingOn?.face === this.rules.state.target ? 'press' : 'move');
+    }
+
     for (const face of frame.justPressed) this.handlePress(face);
   }
 
