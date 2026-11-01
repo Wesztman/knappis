@@ -6,7 +6,8 @@
 export const strings = {
   title: 'Knappis',
   subtitle: 'the little button',
-  pressAnyButton: 'Press any button on your gamepad to start',
+  pressAnyButton: 'Press any button on your Xbox gamepad to start',
+  xboxOnly: 'Only Xbox-style gamepads are supported for now',
   orKeyboard: 'or press a key',
   nonXboxNotice:
     'Only Xbox-style gamepads are supported right now. The pictures may not match this one.',
