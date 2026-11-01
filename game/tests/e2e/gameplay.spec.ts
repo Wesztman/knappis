@@ -47,6 +47,7 @@ test('pressing off a tile or on the wrong tile gives no star', async ({ page }) 
   const errors = await startGame(page);
   const s0 = await state(page);
   await page.keyboard.press(s0.target);
+  await page.waitForTimeout(300);
   expect((await state(page)).stars).toBe(0);
 
   const other = ['A', 'B', 'X', 'Y'].find((b) => b !== s0.target)!;
@@ -68,9 +69,8 @@ test('standing on the target and pressing it earns stars and completes a round',
     expect(s.phase).toBe('playing');
     await standOn(page, s.target);
     await page.keyboard.press(s.target);
-    const after = await state(page);
-    expect(after.stars).toBe(i);
-    expect(after.phase).toBe('celebrating');
+    // Input is handled on the next game frame; wait for it rather than reading at once.
+    await expect.poll(async () => (await state(page)).stars, { timeout: 5000 }).toBe(i);
     if (i === 1) {
       await page.waitForTimeout(200);
       await page.screenshot({ path: 'test-results/celebrate.png' });

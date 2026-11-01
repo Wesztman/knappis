@@ -95,7 +95,9 @@ test('an Xbox-style gamepad starts the game and plays a round', async ({ page })
   }, s.target);
   const index = { A: 0, B: 1, X: 2, Y: 3 }[s.target as 'A' | 'B' | 'X' | 'Y'];
   await tap(page, index);
-  expect((await page.evaluate(() => window.__knappis!.state!())).stars).toBe(1);
+  await expect
+    .poll(() => page.evaluate(() => window.__knappis!.state!().stars), { timeout: 5000 })
+    .toBe(1);
   expect(errors).toEqual([]);
   void pad;
 });
