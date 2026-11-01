@@ -82,8 +82,9 @@ interesting logic testable and lets the rendering be swapped later.
 - Keyboard fallback: arrow keys move, letters A/B/X/Y press. Enter/Space
   also count as "any button" on the Connect screen.
 - Audio can only start after a click or key press (browser autoplay rules);
-  gamepad presses do not count. `Sounds.unlock()` is called on those events
-  and the Play scene shows a "click for sound" hint until it succeeds.
+  gamepad presses do not count. `Sounds.unlock()` is called on those events.
+  The speaker icon always shows the player's on/off choice; while audio is
+  still blocked it pulses softly as a "tap me once" hint, with no text.
 - Headless Chromium (Playwright) runs at a low frame rate, so e2e tests use
   the `window.__knappis` debug hooks (dev builds only) to teleport and read
   state instead of timing key holds.

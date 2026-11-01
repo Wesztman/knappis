@@ -8,6 +8,13 @@ function readPreference(): boolean {
   }
 }
 
+function createContext(): AudioContext | null {
+  const Ctor =
+    window.AudioContext ??
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  return Ctor ? new Ctor() : null;
+}
+
 /**
  * Tiny WebAudio synth so the game has sound before any assets exist.
  * Soft marimba-ish tones only; nothing harsh.
@@ -20,10 +27,22 @@ export class Sounds {
   private _enabled = readPreference();
   private gestureSeen = false;
 
+  constructor() {
+    // Create the context right away. If the browser already trusts the page
+    // (an earlier click to focus it, or a site the player visits a lot), it
+    // starts in the 'running' state and no unlock gesture is needed.
+    this.ctx = createContext();
+    this.ctx?.addEventListener('statechange', () => {
+      if (this.ctx?.state === 'running') this.gestureSeen = true;
+    });
+    if (this.ctx?.state === 'running') this.gestureSeen = true;
+  }
+
   /**
-   * A click or key press has happened, so the browser allows audio. Tracked
-   * ourselves rather than via AudioContext.state, which can stay suspended
-   * where there is no audio device (headless test browsers, some VMs).
+   * The browser allows audio: either a click or key press has happened, or
+   * the context was already running. Tracked ourselves rather than only via
+   * AudioContext.state, which can stay suspended where there is no audio
+   * device (headless test browsers, some VMs).
    */
   get unlocked(): boolean {
     return this.gestureSeen;
@@ -45,14 +64,8 @@ export class Sounds {
 
   unlock(): void {
     this.gestureSeen = true;
-    if (!this.ctx) {
-      const Ctor =
-        window.AudioContext ??
-        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!Ctor) return;
-      this.ctx = new Ctor();
-    }
-    if (this.ctx.state !== 'running') void this.ctx.resume();
+    this.ctx ??= createContext();
+    if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume();
   }
 
   /** Soft tap when stepping onto a tile. */
