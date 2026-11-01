@@ -7,9 +7,21 @@ import { addText } from '../text';
 /** Which part of the pad the child should use next. */
 export type Step = 'move' | 'press';
 
-const STICK = { x: -78, y: -10 };
+/** Positions in the pad's local space, traced from an Xbox Series controller. */
+const STICK = { x: -72, y: -47 };
+const RIGHT_STICK = { x: 37, y: -6 };
+const DPAD = { x: -38, y: -2 };
+const FACE_CENTRE = { x: 72, y: -46 };
+const FACE_SPREAD = 23;
+const FACE_RADIUS = 13;
 /** How far the drawn stick cap travels at full deflection. */
-const STICK_TRAVEL = 8;
+const STICK_TRAVEL = 6;
+
+const BODY = 0x2f2f34;
+const BODY_EDGE = 0x18181b;
+const WELL = 0x1b1b1f;
+const CAP = 0x45454c;
+const CAP_EDGE = 0x5a5a62;
 
 /**
  * A simplified drawing of an Xbox-style gamepad. One face button can be
@@ -32,55 +44,84 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     scene.add.existing(this);
     this.setScale(scale);
 
-    // One smooth silhouette: body with two grips, drawn as a single path
-    // so nothing pokes out and the outline follows the whole shape.
-    const outline = new Phaser.Curves.Path(-80, -50);
-    outline.lineTo(80, -50);
-    outline.cubicBezierTo(115, 20, 120, -50, 128, -12);
-    outline.cubicBezierTo(75, 85, 108, 58, 100, 85);
-    outline.cubicBezierTo(45, 38, 52, 85, 45, 64);
-    outline.lineTo(-45, 38);
-    outline.cubicBezierTo(-75, 85, -45, 64, -52, 85);
-    outline.cubicBezierTo(-115, 20, -100, 85, -108, 58);
-    outline.cubicBezierTo(-80, -50, -128, -12, -120, -50);
-    const points = outline.getPoints(96);
+    // Bumpers peek out above the shoulders, tilted to follow their slope.
+    for (const side of [-1, 1]) {
+      const bumper = scene.add.graphics({ x: side * 60, y: -85 });
+      bumper.fillStyle(BODY_EDGE, 1);
+      bumper.fillRoundedRect(-32, -9, 64, 18, 8);
+      bumper.setRotation(side * 0.1);
+      this.add(bumper);
+    }
+
+    // One smooth silhouette traced from the real controller: wide
+    // shoulders, long grips angled outward, a rounded crotch between them.
+    // Traced from a straight-on photo of the Series controller: tall body,
+    // outer edges that stay wide low down, stubby grips pointing down-and-out.
+    const outline = new Phaser.Curves.Path(-48, -84);
+    outline.lineTo(48, -84);
+    outline.cubicBezierTo(128, -7, 100, -84, 128, -50);
+    outline.cubicBezierTo(82, 86, 126, 40, 100, 72);
+    outline.cubicBezierTo(48, 88, 72, 100, 56, 100);
+    outline.cubicBezierTo(0, 40, 34, 64, 8, 40);
+    outline.cubicBezierTo(-48, 88, -8, 40, -34, 64);
+    outline.cubicBezierTo(-82, 86, -56, 100, -72, 100);
+    outline.cubicBezierTo(-128, -7, -100, 72, -126, 40);
+    outline.cubicBezierTo(-48, -84, -128, -50, -100, -84);
+    const points = outline.getPoints(120);
 
     const body = scene.add.graphics();
-    body.fillStyle(0x4a4a52, 1);
+    body.fillStyle(BODY, 1);
     body.fillPoints(points, true);
-    body.lineStyle(5, 0x2b2b30, 1);
+    body.lineStyle(4, BODY_EDGE, 1);
     body.strokePoints(points, true);
     this.add(body);
 
-    this.stickGlow = scene.add.circle(STICK.x, STICK.y, 28, 0xffffff, 0.9).setVisible(false);
+    this.stickGlow = scene.add.circle(STICK.x, STICK.y, 25, 0xffffff, 0.9).setVisible(false);
     this.add(this.stickGlow);
 
     const details = scene.add.graphics();
-    details.fillStyle(0x2b2b30, 1);
-    details.fillCircle(STICK.x, STICK.y, 21); // left stick well
-    details.fillStyle(0x2b2b30, 1);
-    details.fillRoundedRect(-37, -6, 14, 40, 4); // d-pad vertical
-    details.fillRoundedRect(-50, 7, 40, 14, 4); // d-pad horizontal
-    details.fillCircle(30, 16, 13); // right stick well
-    details.fillStyle(0x6e6e78, 1);
-    details.fillCircle(30, 16, 9);
+    // Left stick well
+    details.fillStyle(WELL, 1);
+    details.fillCircle(STICK.x, STICK.y, 19);
+    // Right stick
+    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 19);
+    details.fillStyle(CAP, 1);
+    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 13);
+    details.lineStyle(2, CAP_EDGE, 1);
+    details.strokeCircle(RIGHT_STICK.x, RIGHT_STICK.y, 13);
+    // D-pad: round dish with a cross
+    details.fillStyle(WELL, 1);
+    details.fillCircle(DPAD.x, DPAD.y, 20);
+    details.fillStyle(CAP, 1);
+    details.fillRoundedRect(DPAD.x - 6, DPAD.y - 16, 12, 32, 3);
+    details.fillRoundedRect(DPAD.x - 16, DPAD.y - 6, 32, 12, 3);
+    // Round button at the top centre, and the three small centre buttons
+    details.fillStyle(CAP, 1);
+    details.fillCircle(0, -70, 10);
+    details.lineStyle(2, CAP_EDGE, 1);
+    details.strokeCircle(0, -70, 10);
+    details.fillStyle(CAP, 1);
+    details.fillCircle(-20, -47, 5);
+    details.fillCircle(20, -47, 5);
+    details.fillCircle(0, -32, 5);
     this.add(details);
 
-    this.stickCap = scene.add.circle(STICK.x, STICK.y, 14, 0x6e6e78);
-    this.stickCap.setStrokeStyle(2, 0x8e8e98, 1);
+    this.stickCap = scene.add.circle(STICK.x, STICK.y, 13, CAP);
+    this.stickCap.setStrokeStyle(2, CAP_EDGE, 1);
     this.add(this.stickCap);
 
-    this.glow = scene.add.circle(0, 0, 17, 0xffffff, 0.9).setVisible(false);
+    this.glow = scene.add.circle(0, 0, FACE_RADIUS + 5, 0xffffff, 0.9).setVisible(false);
     this.add(this.glow);
 
-    const spread = 23;
-    const centre = { x: 74, y: -6 };
     this.buttonNodes = {} as Record<FaceButton, Phaser.GameObjects.Container>;
     for (const face of FACE_BUTTONS) {
       const off = theme.layout[face];
       const style = theme.buttons[face];
-      const node = scene.add.container(centre.x + off.x * spread, centre.y + off.y * spread);
-      node.add(scene.add.circle(0, 0, 13, 0x1d1d22));
+      const node = scene.add.container(
+        FACE_CENTRE.x + off.x * FACE_SPREAD,
+        FACE_CENTRE.y + off.y * FACE_SPREAD,
+      );
+      node.add(scene.add.circle(0, 0, FACE_RADIUS, 0x141416));
       node.add(
         addText(scene, 0, 1, style.label, {
           fontSize: '17px',

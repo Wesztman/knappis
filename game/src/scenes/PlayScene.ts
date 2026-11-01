@@ -19,7 +19,7 @@ import { Tile } from '../ui/Tile';
 /** Pixels per second at full stick deflection. Slow on purpose. */
 const WALK_SPEED = 230;
 
-const HUD_HEIGHT = 140;
+const HUD_HEIGHT = 150;
 const ROOM = new Phaser.Geom.Rectangle(
   70,
   HUD_HEIGHT + 60,
@@ -132,13 +132,7 @@ export class PlayScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    this.diagram = new GamepadDiagram(
-      this,
-      GAME_WIDTH - 170,
-      HUD_HEIGHT / 2 - 10,
-      this.theme,
-      0.85,
-    );
+    this.diagram = new GamepadDiagram(this, GAME_WIDTH - 125, HUD_HEIGHT / 2 + 5, this.theme, 0.64);
 
     this.soundHint = addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 24, strings.clickForSound, {
       fontSize: '20px',

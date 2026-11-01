@@ -47,7 +47,7 @@ export class ConnectScene extends Phaser.Scene {
     rules.lineBetween(GAME_WIDTH / 2 - gap - 70, 205, GAME_WIDTH / 2 - gap, 205);
     rules.lineBetween(GAME_WIDTH / 2 + gap, 205, GAME_WIDTH / 2 + gap + 70, 205);
 
-    this.diagram = new GamepadDiagram(this, GAME_WIDTH / 2, 345, xboxTheme, 1.45);
+    this.diagram = new GamepadDiagram(this, GAME_WIDTH / 2, 362, xboxTheme, 1.3);
     this.time.addEvent({ delay: 500, loop: true, callback: () => this.cycleHighlight() });
     this.cycleHighlight();
 
