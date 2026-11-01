@@ -1,6 +1,6 @@
 {
   "name": "knappis",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A 2D browser game that teaches young children to use a gamepad.",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -23,6 +23,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",

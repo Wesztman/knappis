@@ -5,9 +5,11 @@
 A friendly 2D browser game that teaches young children how to use a gamepad. Walk a little button-creature onto a symbol on the floor
 and press the matching button on the pad.
 
+**Play it:** https://wesztman.github.io/knappis/ (deployed from `main` by GitHub Actions)
+
 **Supported gamepad:** Xbox-style only, for now. See [why](docs/DESIGN.md#supported-gamepads).
 
-**Status:** first playable demo (M0–M2 done). Walk Knappis onto the pulsing
+**Status:** first edition (v1.0.0). Walk Knappis onto the pulsing
 tile and press the matching button. Five stars completes a round. See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 - [Design](docs/DESIGN.md) · [Roadmap](docs/ROADMAP.md) · [Tech](docs/TECH.md)

@@ -109,6 +109,14 @@ letters for the face-button positions). To re-trace from a new photo:
 cd game && NODE_PATH=node_modules node ../tools/trace-silhouette.cjs photo.png
 ```
 
+## Hosting
+
+Static site on GitHub Pages at https://wesztman.github.io/knappis/.
+`.github/workflows/deploy.yml` runs on every push to `main`: install, checks,
+Playwright e2e, `vite build` with `BASE_PATH=/knappis/`, then deploy. The
+version shown in the start-screen footer comes from `game/package.json`.
+Releases are git tags (`v1.0.0` = first edition).
+
 ## Conventions
 
 - Game coordinates 1280×720, scaled to fit the window (`Phaser.Scale.FIT`).
