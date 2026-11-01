@@ -88,11 +88,11 @@ interesting logic testable and lets the rendering be swapped later.
   AudioContext's `statechange` tells us whether the browser agreed.
   The speaker icon always shows the player's on/off choice; while audio is
   still blocked it pulses softly as a "tap me once" hint, with no text.
-- Seen once (Nov 2026): a buggy Microsoft GameInput runtime update made an
-  Xbox gamepad on the wireless adapter power off the instant any page first
-  called `getGamepads()` (any browser, any program; cable unaffected).
-  `winget update Microsoft.GameInput` plus a Windows reboot fixed it. Nothing a page can do causes
-  this; the README troubleshooting section carries the fix.
+- Seen Nov 2026: Carl's Xbox gamepad on the wireless adapter powers off the
+  instant any page first calls `getGamepads()` (any browser; cable and the
+  Xbox Accessories app unaffected). Cause on the PC still unknown; GameInput
+  runtime fixes from a Reddit thread did not hold. Nothing a page can do
+  causes this; the README troubleshooting section says to use a cable.
 - Settings (`src/settings.ts`) live in `localStorage` under `knappis.settings`,
   validated on load. Every game mode implements the `Rules` interface in
   `src/rules/types.ts`; `createRules` maps the settings value to a class.
