@@ -36,6 +36,9 @@ export class ConnectScene extends Phaser.Scene {
 
   create(): void {
     setupCamera(this);
+    // Scene objects live on between visits, so per-visit state is reset here,
+    // not at the field declaration. (The first bug the home button found.)
+    this.starting = false;
     this.input2 = new InputService(this);
     this.sounds = (this.registry.get('sounds') as Sounds | undefined) ?? new Sounds();
     this.registry.set('sounds', this.sounds);

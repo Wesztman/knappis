@@ -37,9 +37,19 @@ test('the gear opens settings; speed and mode are saved and used by the game', a
   expect(settings).toEqual({ mode: 'free', walkSpeed: 100 });
   expect((await state(page)).target).toBeNull();
 
-  // The home button (top-left in the room) goes back to the start screen.
+  // The home button (top-left in the room) goes back to the start screen,
+  // and the game must start again from there without a page reload.
   await page.mouse.click(40, 40);
   await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Connect');
+  await enterGame(page);
+  expect((await state(page)).stars).toBe(0);
+  // Input must work on the second visit too (free play: stand on B, press B).
+  await page.evaluate(() => {
+    const pos = window.__knappis!.tilePosition!('B')!;
+    window.__knappis!.teleport!(pos.x, pos.y);
+  });
+  await page.keyboard.press('B');
+  await expect.poll(async () => (await state(page)).stars, { timeout: 5000 }).toBe(1);
 });
 
 test("free play: any pad counts and the pad's own button is the right one", async ({ page }) => {

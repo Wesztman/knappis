@@ -129,17 +129,17 @@ export class Knappis extends Phaser.GameObjects.Container {
     }, 300);
   }
 
-  /** Head shake: "no, not that button". */
+  /** Head shake: "no, not that button". Slides side to side, no tilting. */
   headShake(): Promise<void> {
     return this.lock((done) => {
       this.scene.tweens.add({
         targets: this.torso,
-        angle: { from: -12, to: 12 },
+        x: { from: -12, to: 12 },
         duration: 70,
         yoyo: true,
         repeat: 3,
         onComplete: () => {
-          this.torso.setAngle(0);
+          this.torso.setX(0);
           done();
         },
       });

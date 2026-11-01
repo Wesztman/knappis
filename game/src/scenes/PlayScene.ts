@@ -67,6 +67,9 @@ export class PlayScene extends Phaser.Scene {
 
   create(): void {
     setupCamera(this);
+    // Scene objects live on between visits: reset per-visit state here.
+    this.animating = false;
+    this.standingOn = null;
     const settings = loadSettings();
     this.mode = settings.mode;
     this.walkSpeed = WALK_SPEEDS[settings.speed];

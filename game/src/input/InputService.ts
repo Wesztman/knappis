@@ -62,6 +62,15 @@ export class InputService {
           kb.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
         ]
       : [];
+    // Buttons already held when a scene starts (the press that started it)
+    // must not count as new presses on the first frame.
+    const pad = this.pad;
+    if (pad) {
+      this.prevPadIndex = pad.index;
+      pad.buttons.forEach((button, index) => {
+        if (button.pressed) this.prevPadButtons.add(index);
+      });
+    }
   }
 
   /** The first connected gamepad, if any, straight from the browser. */
