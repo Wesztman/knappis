@@ -25,7 +25,7 @@ describe('classifyGamepad', () => {
 });
 
 describe('pickGamepad', () => {
-  const monitor = {
+  const junkDevice = {
     id: 'PHL 34B2U6603CH (Vendor: 0bda Product: 4cb4)',
     mapping: '',
     connected: true,
@@ -36,20 +36,20 @@ describe('pickGamepad', () => {
     connected: true,
   };
 
-  it('prefers an Xbox pad over a monitor hub that the browser lists first', () => {
-    expect(pickGamepad([monitor, xbox, null, null])).toBe(xbox);
+  it('prefers an Xbox pad over a junkDevice hub that the browser lists first', () => {
+    expect(pickGamepad([junkDevice, xbox, null, null])).toBe(xbox);
   });
   it('prefers a standard-mapping pad over a non-standard device', () => {
     const generic = { id: 'Generic', mapping: 'standard', connected: true };
-    expect(pickGamepad([monitor, generic])).toBe(generic);
+    expect(pickGamepad([junkDevice, generic])).toBe(generic);
   });
   it('falls back to whatever is connected', () => {
-    expect(pickGamepad([null, monitor])).toBe(monitor);
+    expect(pickGamepad([null, junkDevice])).toBe(junkDevice);
   });
   it('ignores disconnected pads', () => {
     expect(pickGamepad([{ ...xbox, connected: false }])).toBeNull();
   });
-  it('treats the Philips monitor hub as not Xbox-style', () => {
-    expect(classifyGamepad(monitor.id, monitor.mapping)).toBe('other');
+  it('treats the Philips junkDevice hub as not Xbox-style', () => {
+    expect(classifyGamepad(junkDevice.id, junkDevice.mapping)).toBe('other');
   });
 });

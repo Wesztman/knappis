@@ -8,8 +8,8 @@ import { expect, test, type Page } from '@playwright/test';
  */
 const FAKE_PAD = `
   (() => {
-    // A monitor USB hub that Chrome lists as a gamepad, like on Carl's desk.
-    const monitor = {
+    // A non-gamepad HID device that Chrome lists anyway (a junkDevice USB hub seen in the wild).
+    const junkDevice = {
       id: 'PHL 34B2U6603CH (Vendor: 0bda Product: 4cb4)',
       index: 0,
       connected: true,
@@ -35,7 +35,7 @@ const FAKE_PAD = `
       },
       axes(x, y) { pad.axes = [x, y, 0, 0]; pad.timestamp = performance.now(); },
     };
-    navigator.getGamepads = () => (pad.connected ? [monitor, pad, null, null] : [monitor, null, null, null]);
+    navigator.getGamepads = () => (pad.connected ? [junkDevice, pad, null, null] : [junkDevice, null, null, null]);
   })();
 `;
 
