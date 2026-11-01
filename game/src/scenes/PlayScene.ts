@@ -123,19 +123,13 @@ export class PlayScene extends Phaser.Scene {
     this.stars = new StarRow(this, 230, HUD_HEIGHT / 2, this.rules.state.starsPerRound);
 
     this.targetBadge = this.add.container(GAME_WIDTH / 2, HUD_HEIGHT / 2);
-    const halo = this.add.circle(0, 0, 60, 0xffffff, 0.6);
+    // Still halo on purpose: a pulsing badge reads as "go here", and the
+    // floor pad is where the child should go. The badge only pops when the
+    // target changes (see showTarget).
+    const halo = this.add.circle(0, 0, 60, 0xffffff, 0.5);
     this.targetDisc = this.add.circle(0, 0, 50, 0x1d1d22, 1);
     this.targetLabel = addText(this, 0, 3, '', { fontSize: '64px', fontStyle: 'bold' });
     this.targetBadge.add([halo, this.targetDisc, this.targetLabel]);
-    this.tweens.add({
-      targets: halo,
-      scale: { from: 1, to: 1.15 },
-      alpha: { from: 0.6, to: 0.2 },
-      duration: 700,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
 
     this.diagram = new GamepadDiagram(this, GAME_WIDTH - 120, HUD_HEIGHT / 2, this.theme, 0.8);
 
