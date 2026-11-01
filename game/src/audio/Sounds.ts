@@ -65,7 +65,19 @@ export class Sounds {
   unlock(): void {
     this.gestureSeen = true;
     this.ctx ??= createContext();
-    if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume();
+    if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume().catch(() => undefined);
+  }
+
+  /**
+   * Ask the browser to start audio without claiming a gesture happened.
+   * Chromium counts a gamepad button it saw pressed during polling as a user
+   * gesture, so this is called on every gamepad press; if the browser agrees,
+   * the context starts and the statechange listener marks us unlocked. If
+   * not (other browsers), nothing changes and the icon keeps hinting.
+   */
+  tryResume(): void {
+    this.ctx ??= createContext();
+    if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume().catch(() => undefined);
   }
 
   /** Soft tap when stepping onto a tile. */

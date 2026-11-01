@@ -171,6 +171,9 @@ export class PlayScene extends Phaser.Scene {
     if (frame.keyboardUsed && !this.sounds.unlocked) {
       this.sounds.unlock();
       this.soundToggle.refresh();
+    } else if (frame.anyJustPressed && !this.sounds.unlocked) {
+      // Chromium treats a polled gamepad press as a gesture; ask, and see.
+      this.sounds.tryResume();
     }
 
     // Movement

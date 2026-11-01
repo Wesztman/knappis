@@ -147,6 +147,7 @@ export class ConnectScene extends Phaser.Scene {
     if (this.starting) return;
     const frame = this.input2.update();
     if (frame.keyboardUsed) this.sounds.unlock();
+    else if (frame.anyJustPressed) this.sounds.tryResume();
     // While the grown-up has the settings open, a stray pad press must not start the game.
     if (frame.anyJustPressed && !this.settingsPanel.isOpen) this.begin();
   }

@@ -81,8 +81,11 @@ interesting logic testable and lets the rendering be swapped later.
   counts once.
 - Keyboard fallback: arrow keys move, letters A/B/X/Y press. Enter/Space
   also count as "any button" on the Connect screen.
-- Audio can only start after a click or key press (browser autoplay rules);
-  gamepad presses do not count. `Sounds.unlock()` is called on those events.
+- Audio can only start after a user gesture (browser autoplay rules).
+  Clicks and keys always count; `Sounds.unlock()` is called on those.
+  Chromium also counts a gamepad button it saw pressed while the page was
+  polling, so `Sounds.tryResume()` is called on every gamepad press and the
+  AudioContext's `statechange` tells us whether the browser agreed.
   The speaker icon always shows the player's on/off choice; while audio is
   still blocked it pulses softly as a "tap me once" hint, with no text.
 - Seen once (Nov 2026): a buggy Microsoft GameInput runtime update made an
