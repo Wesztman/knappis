@@ -85,6 +85,10 @@ interesting logic testable and lets the rendering be swapped later.
   gamepad presses do not count. `Sounds.unlock()` is called on those events.
   The speaker icon always shows the player's on/off choice; while audio is
   still blocked it pulses softly as a "tap me once" hint, with no text.
+- Seen once (Nov 2026): an outdated Chrome on Windows powered off an Xbox
+  gamepad on the wireless adapter the instant any page called
+  `getGamepads()`. Updating Chrome fixed it. Nothing a page can do causes
+  this, so the README troubleshooting section points players at the update.
 - Headless Chromium (Playwright) runs at a low frame rate, so e2e tests use
   the `window.__knappis` debug hooks (dev builds only) to teleport and read
   state instead of timing key holds.

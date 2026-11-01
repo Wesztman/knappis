@@ -14,6 +14,21 @@ tile and press the matching button. Five stars completes a round. See [`docs/ROA
 
 - [Design](docs/DESIGN.md) · [Roadmap](docs/ROADMAP.md) · [Tech](docs/TECH.md)
 
+## Troubleshooting
+
+**The gamepad switches off the moment the game opens.** Seen with an Xbox
+gamepad on the Xbox Wireless Adapter in Chrome on Windows (November 2026):
+the gamepad died as soon as any page touched the Gamepad API, and would not
+turn on again until the batteries were pulled. The game was not at fault; a
+pending Chrome update was. Open `chrome://settings/help`, let Chrome update
+and relaunch, then try again. Quick ways to tell the two apart: the Xbox
+Accessories app working while every gamepad web page kills the pad points at
+the browser, not the adapter.
+
+**Nothing happens when a button is pressed.** Chrome only reveals a gamepad
+after its first button press, and the page needs a secure context
+(`localhost` or `https`). The start screen prints what it sees.
+
 ## Running
 
 ```bash
