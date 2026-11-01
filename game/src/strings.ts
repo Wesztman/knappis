@@ -7,12 +7,11 @@ export const strings = {
   title: 'Knappis',
   subtitle: 'the little button',
   pressAnyButton: 'Press any button on your Xbox gamepad to start',
-  xboxOnly: 'Only Xbox-style gamepads are supported for now',
   orKeyboard: 'or press a key',
   nonXboxNotice:
     'Only Xbox-style gamepads are supported right now. The pictures may not match this one.',
   clickForSound: 'Click the screen for sound',
-  keyboardHelp: 'Keyboard: arrow keys walk, A B X Y press',
+  footer: 'Xbox-style gamepads only for now  ·  Keyboard: arrow keys walk, A B X Y press',
   padNone: 'No gamepad seen yet. Press a button on it while this window is focused.',
   padSeen: 'Gamepad: ',
   padInsecure:

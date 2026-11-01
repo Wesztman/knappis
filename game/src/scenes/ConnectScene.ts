@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Sounds } from '../audio/Sounds';
-import { GAME_HEIGHT, GAME_WIDTH } from '../config';
+import { GAME_WIDTH } from '../config';
 import { setDebug } from '../debug';
 import { classifyGamepad, FACE_BUTTONS, pickGamepad } from '../input/buttons';
 import { InputService } from '../input/InputService';
@@ -34,8 +34,8 @@ export class ConnectScene extends Phaser.Scene {
     this.sounds = (this.registry.get('sounds') as Sounds | undefined) ?? new Sounds();
     this.registry.set('sounds', this.sounds);
 
-    addText(this, GAME_WIDTH / 2, 125, strings.title, { fontSize: '120px', fontStyle: 'bold' });
-    const subtitle = addText(this, GAME_WIDTH / 2, 232, strings.subtitle, {
+    addText(this, GAME_WIDTH / 2, 112, strings.title, { fontSize: '120px', fontStyle: 'bold' });
+    const subtitle = addText(this, GAME_WIDTH / 2, 205, strings.subtitle, {
       fontSize: '26px',
       fontStyle: 'italic',
       color: '#a3886a',
@@ -44,31 +44,30 @@ export class ConnectScene extends Phaser.Scene {
     const rules = this.add.graphics();
     rules.lineStyle(2, 0xd9bf8c, 1);
     const gap = subtitle.width / 2 + 22;
-    rules.lineBetween(GAME_WIDTH / 2 - gap - 70, 232, GAME_WIDTH / 2 - gap, 232);
-    rules.lineBetween(GAME_WIDTH / 2 + gap, 232, GAME_WIDTH / 2 + gap + 70, 232);
+    rules.lineBetween(GAME_WIDTH / 2 - gap - 70, 205, GAME_WIDTH / 2 - gap, 205);
+    rules.lineBetween(GAME_WIDTH / 2 + gap, 205, GAME_WIDTH / 2 + gap + 70, 205);
 
-    this.diagram = new GamepadDiagram(this, GAME_WIDTH / 2, 360, xboxTheme, 1.6);
+    this.diagram = new GamepadDiagram(this, GAME_WIDTH / 2, 345, xboxTheme, 1.45);
     this.time.addEvent({ delay: 500, loop: true, callback: () => this.cycleHighlight() });
     this.cycleHighlight();
 
-    addText(this, GAME_WIDTH / 2, 548, strings.pressAnyButton, { fontSize: '34px' });
-    addText(this, GAME_WIDTH / 2, 594, strings.orKeyboard, { fontSize: '24px', color: '#7a6a60' });
-    addText(this, GAME_WIDTH / 2, 636, strings.xboxOnly, { fontSize: '20px', color: '#9a8a80' });
-    addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 30, strings.keyboardHelp, {
+    addText(this, GAME_WIDTH / 2, 530, strings.pressAnyButton, { fontSize: '34px' });
+    addText(this, GAME_WIDTH / 2, 576, strings.orKeyboard, { fontSize: '24px', color: '#7a6a60' });
+    addText(this, GAME_WIDTH / 2, 692, strings.footer, {
       fontSize: '20px',
       color: '#9a8a80',
     });
 
     // Live readout of what the browser itself reports, independent of Phaser.
     // Doubles as the debugging tool promised in the design doc.
-    this.padStatus = addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 68, '', {
+    this.padStatus = addText(this, GAME_WIDTH / 2, 640, '', {
       fontSize: '20px',
       color: '#9a8a80',
     });
     this.time.addEvent({ delay: 250, loop: true, callback: () => this.refreshPadStatus() });
     this.refreshPadStatus();
 
-    this.notice = addText(this, GAME_WIDTH / 2, 668, strings.nonXboxNotice, {
+    this.notice = addText(this, GAME_WIDTH / 2, 640, strings.nonXboxNotice, {
       fontSize: '26px',
       color: '#b3261e',
       backgroundColor: '#ffe6e3',
@@ -127,6 +126,7 @@ export class ConnectScene extends Phaser.Scene {
     if (pad && pad.kind === 'other') {
       // Only Xbox-style pads are supported right now; warn, then let them try.
       this.notice.setVisible(true);
+      this.padStatus.setVisible(false);
       this.time.delayedCall(3000, () => this.scene.start('Play'));
       return;
     }
