@@ -23,3 +23,35 @@ export function classifyGamepad(id: string, mapping: string): GamepadKind {
   }
   return mapping === 'standard' ? 'xbox' : 'other';
 }
+
+/** The subset of the browser Gamepad we need to choose between devices. */
+export interface GamepadLike {
+  id: string;
+  mapping: string;
+  connected: boolean;
+}
+
+/** How much we trust a device to be a real, usable gamepad. Higher is better. */
+export function gamepadScore(pad: GamepadLike): number {
+  if (classifyGamepad(pad.id, pad.mapping) === 'xbox') return 2;
+  if (pad.mapping === 'standard') return 1;
+  return 0;
+}
+
+/**
+ * Pick the device to play with. Browsers list anything HID-ish as a gamepad
+ * (monitor USB hubs, for example), so we cannot just take the first one.
+ */
+export function pickGamepad<T extends GamepadLike>(pads: Iterable<T | null>): T | null {
+  let best: T | null = null;
+  let bestScore = -1;
+  for (const pad of pads) {
+    if (!pad || !pad.connected) continue;
+    const score = gamepadScore(pad);
+    if (score > bestScore) {
+      best = pad;
+      bestScore = score;
+    }
+  }
+  return best;
+}

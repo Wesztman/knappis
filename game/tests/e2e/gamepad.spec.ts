@@ -8,9 +8,19 @@ import { expect, test, type Page } from '@playwright/test';
  */
 const FAKE_PAD = `
   (() => {
+    // A monitor USB hub that Chrome lists as a gamepad, like on Carl's desk.
+    const monitor = {
+      id: 'PHL 34B2U6603CH (Vendor: 0bda Product: 4cb4)',
+      index: 0,
+      connected: true,
+      mapping: '',
+      timestamp: 0,
+      axes: [0, 0],
+      buttons: [],
+    };
     const pad = {
       id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 02fd)',
-      index: 0,
+      index: 1,
       connected: false,
       mapping: 'standard',
       timestamp: 0,
@@ -25,7 +35,7 @@ const FAKE_PAD = `
       },
       axes(x, y) { pad.axes = [x, y, 0, 0]; pad.timestamp = performance.now(); },
     };
-    navigator.getGamepads = () => (pad.connected ? [pad, null, null, null] : [null, null, null, null]);
+    navigator.getGamepads = () => (pad.connected ? [monitor, pad, null, null] : [monitor, null, null, null]);
   })();
 `;
 

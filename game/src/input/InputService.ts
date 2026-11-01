@@ -3,6 +3,7 @@ import {
   classifyGamepad,
   DPAD_INDEX,
   FACE_BUTTONS,
+  pickGamepad,
   STANDARD_BUTTON_INDEX,
   type FaceButton,
   type GamepadKind,
@@ -42,6 +43,7 @@ export class InputService {
   private readonly letterKeys: Record<FaceButton, Phaser.Input.Keyboard.Key> | null;
   private readonly anyKey: Phaser.Input.Keyboard.Key[];
   private prevPadButtons = new Set<number>();
+  private prevPadIndex = -1;
 
   constructor(private readonly scene: Phaser.Scene) {
     const kb = scene.input.keyboard;
@@ -65,10 +67,7 @@ export class InputService {
   /** The first connected gamepad, if any, straight from the browser. */
   get pad(): Gamepad | null {
     if (typeof navigator.getGamepads !== 'function') return null;
-    for (const p of navigator.getGamepads()) {
-      if (p && p.connected) return p;
-    }
-    return null;
+    return pickGamepad(navigator.getGamepads());
   }
 
   padInfo(): PadInfo | null {
@@ -88,6 +87,11 @@ export class InputService {
     let stick: Vec2 = { x: 0, y: 0 };
     let dpad: Vec2 = { x: 0, y: 0 };
     if (pad) {
+      if (pad.index !== this.prevPadIndex) {
+        // A different device took over; forget the old button state.
+        this.prevPadButtons.clear();
+        this.prevPadIndex = pad.index;
+      }
       stick = applyDeadZone(pad.axes[0] ?? 0, pad.axes[1] ?? 0);
       const down = (i: number) => pad.buttons[i]?.pressed ?? false;
       dpad = {
@@ -109,6 +113,7 @@ export class InputService {
       this.prevPadButtons = now;
     } else {
       this.prevPadButtons.clear();
+      this.prevPadIndex = -1;
     }
 
     // --- keyboard ---

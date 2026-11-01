@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { Sounds } from '../audio/Sounds';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { setDebug } from '../debug';
-import { classifyGamepad, FACE_BUTTONS } from '../input/buttons';
+import { classifyGamepad, FACE_BUTTONS, pickGamepad } from '../input/buttons';
 import { InputService } from '../input/InputService';
 import { setupCamera } from '../render';
 import { strings } from '../strings';
@@ -90,14 +90,18 @@ export class ConnectScene extends Phaser.Scene {
       return;
     }
     const pads = typeof navigator.getGamepads === 'function' ? navigator.getGamepads() : [];
-    const live = Array.from(pads).find((p) => p && p.connected);
+    const live = pickGamepad(pads);
     if (!live) {
       this.padStatus.setText(strings.padNone).setColor('#9a8a80');
       return;
     }
+    const others = Array.from(pads).filter((p) => p && p.connected && p !== live).length;
     const kind = classifyGamepad(live.id, live.mapping);
+    const suffix =
+      (kind === 'xbox' ? '' : ' (not Xbox-style)') +
+      (others > 0 ? ` · ${others} other device${others > 1 ? 's' : ''} ignored` : '');
     this.padStatus
-      .setText(`${strings.padSeen}${live.id}${kind === 'xbox' ? '' : ' (not Xbox-style)'}`)
+      .setText(`${strings.padSeen}${live.id}${suffix}`)
       .setColor(kind === 'xbox' ? '#3c8c4a' : '#b3261e');
   }
 

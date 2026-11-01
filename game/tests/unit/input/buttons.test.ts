@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyGamepad } from '../../../src/input/buttons';
+import { classifyGamepad, pickGamepad } from '../../../src/input/buttons';
 
 describe('classifyGamepad', () => {
   it('recognises Xbox pads by name', () => {
@@ -21,5 +21,35 @@ describe('classifyGamepad', () => {
   });
   it('flags non-standard mappings as other', () => {
     expect(classifyGamepad('Weird Pad', '')).toBe('other');
+  });
+});
+
+describe('pickGamepad', () => {
+  const monitor = {
+    id: 'PHL 34B2U6603CH (Vendor: 0bda Product: 4cb4)',
+    mapping: '',
+    connected: true,
+  };
+  const xbox = {
+    id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 02fd)',
+    mapping: 'standard',
+    connected: true,
+  };
+
+  it('prefers an Xbox pad over a monitor hub that the browser lists first', () => {
+    expect(pickGamepad([monitor, xbox, null, null])).toBe(xbox);
+  });
+  it('prefers a standard-mapping pad over a non-standard device', () => {
+    const generic = { id: 'Generic', mapping: 'standard', connected: true };
+    expect(pickGamepad([monitor, generic])).toBe(generic);
+  });
+  it('falls back to whatever is connected', () => {
+    expect(pickGamepad([null, monitor])).toBe(monitor);
+  });
+  it('ignores disconnected pads', () => {
+    expect(pickGamepad([{ ...xbox, connected: false }])).toBeNull();
+  });
+  it('treats the Philips monitor hub as not Xbox-style', () => {
+    expect(classifyGamepad(monitor.id, monitor.mapping)).toBe('other');
   });
 });
