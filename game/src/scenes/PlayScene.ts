@@ -32,7 +32,7 @@ const ROOM = new Phaser.Geom.Rectangle(
  * Y top, X left, B right, A bottom. The room is a giant button cluster.
  */
 const PAD_CENTRE = { x: GAME_WIDTH / 2, y: 435 };
-const PAD_SPREAD = 175;
+const PAD_SPREAD = 192;
 
 /**
  * Mode 1: "Hitta knappen". Reads input, feeds the rules, renders events.

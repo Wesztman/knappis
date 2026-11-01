@@ -4,9 +4,9 @@ import type { SymbolTheme } from '../themes/types';
 import { addText } from '../text';
 
 /** Radius of the whole floor pad (what counts as "standing on it"). */
-export const TILE_RADIUS = 100;
+export const TILE_RADIUS = 82;
 /** Radius of the dark button face in the middle. */
-const BUTTON_RADIUS = 66;
+const BUTTON_RADIUS = 54;
 
 /**
  * A floor pad that looks like a giant version of one face button: a dark
@@ -43,7 +43,7 @@ export class Tile extends Phaser.GameObjects.Container {
     this.rim = scene.add.circle(0, 0, BUTTON_RADIUS + 6, 0xffffff, 1);
     this.add(this.rim);
     this.add(scene.add.circle(0, 0, BUTTON_RADIUS, 0x1d1d22, 1));
-    this.label = addText(scene, 0, 4, '', { fontSize: '96px', fontStyle: 'bold' });
+    this.label = addText(scene, 0, 3, '', { fontSize: '78px', fontStyle: 'bold' });
     this.add(this.label);
 
     this.setFace(face);

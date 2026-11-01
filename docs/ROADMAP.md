@@ -33,7 +33,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 
 ## M3 – Polish for real kids
 - [x] Sound effects (generated WebAudio tones for now; CC0 samples later)
-- [ ] Settings scene: movement speed, hold-to-press, timer on/off
+- [ ] Settings scene: movement speed, hold-to-press, timer on/off, room size (compact / wide)
 - [ ] Symbol theme switch (Xbox / PlayStation) – first non-Xbox support
 - [ ] Playtest with an actual child; write findings in `docs/PLAYTESTS.md`
 
