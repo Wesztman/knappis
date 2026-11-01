@@ -32,8 +32,6 @@ export class Knappis extends Phaser.GameObjects.Container {
     shell.fillCircle(0, 0, 50);
     shell.lineStyle(6, 0x3a2e2a, 1);
     shell.strokeCircle(0, 0, 50);
-    shell.fillStyle(0xffb199, 1);
-    shell.fillCircle(-16, -18, 12); // highlight
     this.torso.add(shell);
 
     this.face = scene.add.container(0, 0);
