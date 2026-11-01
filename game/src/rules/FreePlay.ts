@@ -22,7 +22,7 @@ export class FreePlay implements Rules {
   private readonly starsPerRound: number;
 
   constructor(options: FreePlayOptions = {}) {
-    this.starsPerRound = options.starsPerRound ?? 5;
+    this.starsPerRound = options.starsPerRound ?? FACE_BUTTONS.length;
   }
 
   get state(): RulesState {

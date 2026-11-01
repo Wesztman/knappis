@@ -2,7 +2,6 @@ import { FACE_BUTTONS, type FaceButton } from '../input/buttons';
 import type { Phase, Rules, RulesEvent, RulesState } from './types';
 
 export interface FindTheButtonOptions {
-  starsPerRound?: number;
   /**
    * Shuffle which button each floor pad shows between rounds. Off by default:
    * the pads sit in the same diamond as on the gamepad, and that mapping is
@@ -18,6 +17,10 @@ export type FindTheButtonState = RulesState & { readonly target: FaceButton };
 /**
  * Pure state machine for Mode 1, "Hitta knappen".
  *
+ * A round asks for each of the four buttons exactly once, in a random
+ * order, so four stars means "the whole gamepad". The first target of a
+ * round is never the last target of the previous one.
+ *
  * The scene feeds it button presses and tells it when animations are done
  * (`advance`). It never touches Phaser, so it is fully unit-tested.
  *
@@ -28,19 +31,20 @@ export type FindTheButtonState = RulesState & { readonly target: FaceButton };
 export class FindTheButton implements Rules {
   private tiles: FaceButton[];
   private target: FaceButton;
+  /** Targets still to come this round, in order. */
+  private queue: FaceButton[] = [];
   private stars = 0;
   private round = 1;
   private phase: Phase = 'playing';
-  private readonly starsPerRound: number;
+  private readonly starsPerRound = FACE_BUTTONS.length;
   private readonly shuffle: boolean;
   private readonly random: () => number;
 
   constructor(options: FindTheButtonOptions = {}) {
-    this.starsPerRound = options.starsPerRound ?? 5;
     this.shuffle = options.shuffle ?? false;
     this.random = options.random ?? Math.random;
     this.tiles = this.shuffle ? this.shuffled([...FACE_BUTTONS]) : [...FACE_BUTTONS];
-    this.target = this.pickTarget(null);
+    this.target = this.nextTarget(null);
   }
 
   /** Same as `RulesState`, but this mode always has a target. */
@@ -77,11 +81,11 @@ export class FindTheButton implements Rules {
   /** Call when the current animation has finished. */
   advance(): RulesEvent[] {
     if (this.phase === 'celebrating') {
-      if (this.stars >= this.starsPerRound) {
+      if (this.queue.length === 0) {
         this.phase = 'roundComplete';
         return [{ type: 'roundComplete', round: this.round }];
       }
-      this.target = this.pickTarget(this.target);
+      this.target = this.nextTarget(this.target);
       this.phase = 'playing';
       return [{ type: 'newTarget', target: this.target }];
     }
@@ -89,17 +93,28 @@ export class FindTheButton implements Rules {
       this.round += 1;
       this.stars = 0;
       if (this.shuffle) this.tiles = this.shuffled(this.tiles);
-      this.target = this.pickTarget(this.target);
+      this.target = this.nextTarget(this.target);
       this.phase = 'playing';
       return [{ type: 'newRound', round: this.round, tiles: this.tiles, target: this.target }];
     }
     return [];
   }
 
-  private pickTarget(previous: FaceButton | null): FaceButton {
-    const candidates = FACE_BUTTONS.filter((b) => b !== previous);
-    const index = Math.min(candidates.length - 1, Math.floor(this.random() * candidates.length));
-    return candidates[index] as FaceButton;
+  /** Take the next target of the round, dealing a fresh round when the queue is empty. */
+  private nextTarget(previous: FaceButton | null): FaceButton {
+    if (this.queue.length === 0) {
+      this.queue = this.shuffled([...FACE_BUTTONS]);
+      // Never ask for the same button twice in a row across the round boundary.
+      if (this.queue[0] === previous && this.queue.length > 1) {
+        const swap =
+          1 + Math.min(this.queue.length - 2, Math.floor(this.random() * (this.queue.length - 1)));
+        [this.queue[0], this.queue[swap]] = [
+          this.queue[swap] as FaceButton,
+          this.queue[0] as FaceButton,
+        ];
+      }
+    }
+    return this.queue.shift() as FaceButton;
   }
 
   private shuffled(input: FaceButton[]): FaceButton[] {

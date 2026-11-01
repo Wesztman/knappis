@@ -10,8 +10,8 @@ and press the matching button on the pad.
 **Supported gamepad:** Xbox-style only, for now. See [why](docs/DESIGN.md#supported-gamepads).
 
 **Status:** first edition (v1.0.0) plus the first playtest's fixes. Walk
-Knappis onto the glowing pad and press the matching button; five stars
-completes a round. A gear on the start screen sets walking speed and picks
+Knappis onto the glowing pad and press the matching button; one star per
+button, four stars complete a round. A gear on the start screen sets walking speed and picks
 "find the button" or "free play". See [`docs/ROADMAP.md`](docs/ROADMAP.md)
 and [`docs/PLAYTESTS.md`](docs/PLAYTESTS.md).
 

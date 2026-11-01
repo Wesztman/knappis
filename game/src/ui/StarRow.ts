@@ -1,8 +1,15 @@
 import Phaser from 'phaser';
 
-/** Row of stars that fill in as the child earns them. */
+const GOLD = 0xffc83d;
+
+/**
+ * Row of stars that fill in as the child earns them. A star can take a
+ * colour of its own (the button it was earned with), so a full row in
+ * "find the button" is also a picture of the whole gamepad.
+ */
 export class StarRow extends Phaser.GameObjects.Container {
   private readonly stars: Phaser.GameObjects.Star[] = [];
+  private readonly colours: number[] = [];
   private filled = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number, count: number, spacing = 60) {
@@ -17,14 +24,18 @@ export class StarRow extends Phaser.GameObjects.Container {
     }
   }
 
-  setStars(n: number): void {
+  /** Fill the first `n` stars; newly earned ones take `colour` (gold by default). */
+  setStars(n: number, colour: number = GOLD): void {
     const target = Math.max(0, Math.min(this.stars.length, n));
+    for (let i = this.filled; i < target; i++) this.colours[i] = colour;
     for (let i = 0; i < this.stars.length; i++) {
       const star = this.stars[i];
       if (!star) continue;
       const on = i < target;
-      star.setFillStyle(on ? 0xffc83d : 0xffffff);
-      star.setStrokeStyle(4, on ? 0xe0a000 : 0xd9c79a);
+      const fill = this.colours[i] ?? GOLD;
+      const edge = Phaser.Display.Color.ValueToColor(fill).darken(18).color;
+      star.setFillStyle(on ? fill : 0xffffff);
+      star.setStrokeStyle(4, on ? edge : 0xd9c79a);
     }
     if (target > this.filled) {
       const star = this.stars[target - 1];

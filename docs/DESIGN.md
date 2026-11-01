@@ -47,8 +47,10 @@ symbol you are standing on.
    - Correct tile, wrong button → the tile wobbles, the on-screen pad shows
      the right button again. No penalty.
    - Not on a tile → Knappis shrugs, small "boing".
-6. After N stars (default 5) a short "round complete" dance plays, then the
-   next round starts. Pads stay where they are; the fixed layout is the
+6. A round asks for each of the four buttons once, in a random order, so
+   four stars means "the whole gamepad". Each star takes the colour of the
+   button it was earned with. After the fourth a short "round complete"
+   dance plays, then the next round starts. Pads stay where they are; the fixed layout is the
    lesson. A "mixed-up" mode that shuffles them can come later.
 
 ## Supported gamepads
@@ -87,8 +89,8 @@ then, a non-Xbox pad may work for movement but the pictures will be wrong.
 The first tester asked for it: nothing is asked for. The child walks onto
 any pad and presses that pad's button to earn a star. The badge at the top
 is hidden; the gamepad in the corner lights the button of whatever pad
-Knappis stands on, so the pad itself becomes the prompt. Same stars, same
-round-complete dance. Picked in the settings panel.
+Knappis stands on, so the pad itself becomes the prompt. Four gold stars
+make a round, same round-complete dance. Picked in the settings panel.
 
 ## Settings (grown-ups only)
 

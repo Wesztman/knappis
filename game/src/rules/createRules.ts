@@ -4,11 +4,11 @@ import { FreePlay } from './FreePlay';
 import type { Rules } from './types';
 
 /** The one place that maps a settings value to a rules implementation. */
-export function createRules(mode: GameMode, starsPerRound: number): Rules {
+export function createRules(mode: GameMode): Rules {
   switch (mode) {
     case 'free':
-      return new FreePlay({ starsPerRound });
+      return new FreePlay();
     case 'find':
-      return new FindTheButton({ starsPerRound });
+      return new FindTheButton();
   }
 }

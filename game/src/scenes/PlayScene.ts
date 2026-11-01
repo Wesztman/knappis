@@ -18,8 +18,6 @@ import { SoundToggle } from '../ui/SoundToggle';
 import { StarRow } from '../ui/StarRow';
 import { Tile } from '../ui/Tile';
 
-const STARS_PER_ROUND = 5;
-
 const HUD_HEIGHT = 150;
 const ROOM = new Phaser.Geom.Rectangle(
   70,
@@ -73,7 +71,7 @@ export class PlayScene extends Phaser.Scene {
     const settings = loadSettings();
     this.mode = settings.mode;
     this.walkSpeed = WALK_SPEEDS[settings.speed];
-    this.rules = createRules(settings.mode, STARS_PER_ROUND);
+    this.rules = createRules(settings.mode);
     this.input2 = new InputService(this);
     this.sounds = (this.registry.get('sounds') as Sounds | undefined) ?? new Sounds();
 
@@ -270,7 +268,11 @@ export class PlayScene extends Phaser.Scene {
         tile?.pop();
         tile?.setTarget(false);
         this.confetti.explode(40, this.knappis.x, this.knappis.y - 60);
-        this.stars.setStars(e.stars);
+        // One star per button: in "find the button" each star takes its button's colour.
+        this.stars.setStars(
+          e.stars,
+          this.mode === 'find' ? this.theme.buttons[e.button].colour : undefined,
+        );
         await this.knappis.jump();
         await this.wait(250);
         this.animating = false;
