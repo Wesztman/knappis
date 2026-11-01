@@ -27,13 +27,12 @@ const ROOM = new Phaser.Geom.Rectangle(
   GAME_HEIGHT - HUD_HEIGHT - 80,
 );
 
-/** Fixed tile slots; which button each shows comes from the rules. */
-const TILE_SLOTS = [
-  { x: 330, y: 330 },
-  { x: 950, y: 330 },
-  { x: 330, y: 580 },
-  { x: 950, y: 580 },
-];
+/**
+ * The floor pads sit in the same diamond as the face buttons on the pad:
+ * Y top, X left, B right, A bottom. The room is a giant button cluster.
+ */
+const PAD_CENTRE = { x: GAME_WIDTH / 2, y: 435 };
+const PAD_SPREAD = 175;
 
 /**
  * Mode 1: "Hitta knappen". Reads input, feeds the rules, renders events.
@@ -69,12 +68,18 @@ export class PlayScene extends Phaser.Scene {
     this.drawRoom();
     this.buildHud();
 
-    this.tiles = TILE_SLOTS.map((slot, i) => {
-      const face = this.rules.state.tiles[i] ?? 'A';
-      return new Tile(this, slot.x, slot.y, face, this.theme);
+    this.tiles = this.rules.state.tiles.map((face) => {
+      const off = this.theme.layout[face];
+      return new Tile(
+        this,
+        PAD_CENTRE.x + off.x * PAD_SPREAD,
+        PAD_CENTRE.y + off.y * PAD_SPREAD,
+        face,
+        this.theme,
+      );
     });
 
-    this.knappis = new Knappis(this, GAME_WIDTH / 2, 470);
+    this.knappis = new Knappis(this, PAD_CENTRE.x, PAD_CENTRE.y + 40);
 
     this.confetti = this.add.particles(0, 0, 'confetti', {
       speed: { min: 250, max: 650 },
@@ -246,7 +251,7 @@ export class PlayScene extends Phaser.Scene {
       }
       case 'newRound': {
         this.stars.setStars(0);
-        await this.reshuffleTiles(e.tiles);
+        await this.refreshTiles(e.tiles);
         this.animating = false;
         this.showTarget(e.target);
         return;
@@ -277,24 +282,15 @@ export class PlayScene extends Phaser.Scene {
     });
   }
 
-  private async reshuffleTiles(faces: readonly FaceButton[]): Promise<void> {
-    // Shrink away, swap labels, grow back.
-    await new Promise<void>((resolve) =>
-      this.tweens.add({
-        targets: this.tiles,
-        scale: 0,
-        duration: 300,
-        ease: 'Back.easeIn',
-        onComplete: () => resolve(),
-      }),
-    );
+  /** Between rounds: a quick bounce, and re-label if the rules shuffled. */
+  private async refreshTiles(faces: readonly FaceButton[]): Promise<void> {
     this.tiles.forEach((t, i) => t.setFace(faces[i] ?? 'A'));
     this.standingOn = null;
     await new Promise<void>((resolve) =>
       this.tweens.add({
         targets: this.tiles,
-        scale: 1,
-        duration: 400,
+        scale: { from: 0.8, to: 1 },
+        duration: 450,
         ease: 'Back.easeOut',
         onComplete: () => resolve(),
       }),

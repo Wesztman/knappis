@@ -3,6 +3,12 @@ import type { Phase, RulesEvent, RulesState } from './types';
 
 export interface FindTheButtonOptions {
   starsPerRound?: number;
+  /**
+   * Shuffle which button each floor pad shows between rounds. Off by default:
+   * the pads sit in the same diamond as on the gamepad, and that mapping is
+   * the lesson. A "mixed-up" mode can turn this on later.
+   */
+  shuffle?: boolean;
   /** Injectable for deterministic tests. Must return [0, 1). */
   random?: () => number;
 }
@@ -24,12 +30,14 @@ export class FindTheButton {
   private round = 1;
   private phase: Phase = 'playing';
   private readonly starsPerRound: number;
+  private readonly shuffle: boolean;
   private readonly random: () => number;
 
   constructor(options: FindTheButtonOptions = {}) {
     this.starsPerRound = options.starsPerRound ?? 5;
+    this.shuffle = options.shuffle ?? false;
     this.random = options.random ?? Math.random;
-    this.tiles = this.shuffled([...FACE_BUTTONS]);
+    this.tiles = this.shuffle ? this.shuffled([...FACE_BUTTONS]) : [...FACE_BUTTONS];
     this.target = this.pickTarget(null);
   }
 
@@ -77,7 +85,7 @@ export class FindTheButton {
     if (this.phase === 'roundComplete') {
       this.round += 1;
       this.stars = 0;
-      this.tiles = this.shuffled(this.tiles);
+      if (this.shuffle) this.tiles = this.shuffled(this.tiles);
       this.target = this.pickTarget(this.target);
       this.phase = 'playing';
       return [{ type: 'newRound', round: this.round, tiles: this.tiles, target: this.target }];

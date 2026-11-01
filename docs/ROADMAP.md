@@ -28,7 +28,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 - [x] On-screen gamepad drawing with the asked-for button lit
 - [x] Correct press → celebration (particles, jingle, star added)
 - [x] Wrong press → gentle wobble, hint repeats
-- [x] 5 stars → round complete dance → reshuffle tiles
+- [x] 5 stars → round complete dance → next round (pads stay in the gamepad diamond)
 - [x] Unit tests for the game-rules state machine (pure TS, no Phaser)
 
 ## M3 – Polish for real kids

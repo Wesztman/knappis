@@ -94,6 +94,20 @@ describe('FindTheButton', () => {
     expect([...game.state.tiles].sort()).toEqual([...FACE_BUTTONS].sort());
   });
 
+  it('keeps the pads in gamepad order unless shuffling is on', () => {
+    const fixed_ = new FindTheButton({ starsPerRound: 1, random: fixed(0.9) });
+    expect(fixed_.state.tiles).toEqual(FACE_BUTTONS);
+    const t = fixed_.state.target;
+    fixed_.press(t, t);
+    fixed_.advance();
+    fixed_.advance();
+    expect(fixed_.state.round).toBe(2);
+    expect(fixed_.state.tiles).toEqual(FACE_BUTTONS);
+
+    const mixed = new FindTheButton({ shuffle: true, random: fixed(0.9) });
+    expect([...mixed.state.tiles].sort()).toEqual([...FACE_BUTTONS].sort());
+  });
+
   it('advance does nothing while playing', () => {
     const game = new FindTheButton({ random: fixed(0) });
     expect(game.advance()).toEqual([]);

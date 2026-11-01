@@ -30,8 +30,10 @@ symbol you are standing on.
 ## Core loop (Mode 1: "Hitta knappen" / Find the button)
 
 1. Knappis stands in a bounded room (one screen, no scrolling).
-2. Four floor tiles each show a gamepad symbol (Xbox: A green, B red,
-   X blue, Y yellow).
+2. Four round floor pads, each a giant version of one face button, laid out
+   in the same diamond as on the gamepad: Y top, X left, B right, A bottom.
+   The room is a big button cluster, so walking direction matches thumb
+   direction.
 3. One tile is "asked for": it pulses, and the on-screen pad lights that
    button. Optionally a voice says the colour/letter.
 4. The child walks Knappis onto a tile with the left stick or D-pad.
@@ -43,7 +45,8 @@ symbol you are standing on.
      the right button again. No penalty.
    - Not on a tile → Knappis shrugs, small "boing".
 6. After N stars (default 5) a short "round complete" dance plays, then the
-   next round starts with a shuffled tile layout.
+   next round starts. Pads stay where they are; the fixed layout is the
+   lesson. A "mixed-up" mode that shuffles them can come later.
 
 ## Supported gamepads
 
