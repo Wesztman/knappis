@@ -19,14 +19,23 @@ and [`docs/PLAYTESTS.md`](docs/PLAYTESTS.md).
 
 ## Troubleshooting
 
-**The gamepad switches off the moment the game opens.** Seen with an Xbox
-gamepad on the Xbox Wireless Adapter in Chrome on Windows (November 2026):
-the gamepad died as soon as any page touched the Gamepad API, and would not
-turn on again until the batteries were pulled. The game was not at fault; a
-pending Chrome update was. Open `chrome://settings/help`, let Chrome update
-and relaunch, then try again. Quick ways to tell the two apart: the Xbox
-Accessories app working while every gamepad web page kills the pad points at
-the browser, not the adapter.
+**The gamepad switches off the moment the game opens.** Seen in November
+2026 with an Xbox gamepad on the Xbox Wireless Adapter in Windows 11: the
+gamepad died the instant any browser page (or any program) first opened it,
+yet worked on a USB cable, and kept working wirelessly if the page was
+already running. The game is not at fault. The cause was a buggy update to
+Microsoft's GameInput runtime, the Windows service that programs go through
+to discover gamepads. Fix, in a Windows terminal:
+
+```
+winget update Microsoft.GameInput
+```
+
+Then restart the gamepad and reload. If no update is offered, open
+Services, stop "GameInput Service", set its startup type to Disabled and
+reboot. Quick way to tell this apart from a hardware fault: a USB cable
+works, and the Xbox Accessories app works, while every gamepad web page
+kills the pad.
 
 **Nothing happens when a button is pressed.** Chrome only reveals a gamepad
 after its first button press, and the page needs a secure context
