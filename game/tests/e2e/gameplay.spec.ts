@@ -46,7 +46,7 @@ test('arrow keys move Knappis and the room clamps movement', async ({ page }) =>
 test('pressing off a tile or on the wrong tile gives no star', async ({ page }) => {
   const errors = await startGame(page);
   const s0 = await state(page);
-  await page.keyboard.press(s0.target);
+  await page.keyboard.press(s0.target!);
   await page.waitForTimeout(300);
   expect((await state(page)).stars).toBe(0);
 
@@ -67,8 +67,8 @@ test('standing on the target and pressing it earns stars and completes a round',
   for (let i = 1; i <= starsPerRound; i++) {
     const s = await state(page);
     expect(s.phase).toBe('playing');
-    await standOn(page, s.target);
-    await page.keyboard.press(s.target);
+    await standOn(page, s.target!);
+    await page.keyboard.press(s.target!);
     // Input is handled on the next game frame; wait for it rather than reading at once.
     await expect.poll(async () => (await state(page)).stars, { timeout: 5000 }).toBe(i);
     if (i === 1) {

@@ -9,21 +9,31 @@ export const TILE_RADIUS = 82;
 const BUTTON_RADIUS = 54;
 
 /**
+ * How Knappis relates to this pad right now.
+ *  - off:   nobody here
+ *  - right: Knappis stands here and this is a pad worth pressing on
+ *  - wrong: Knappis stands here but another pad was asked for
+ */
+export type Standing = 'off' | 'right' | 'wrong';
+
+/**
  * A floor pad that looks like a giant version of one face button: a dark
  * round face with the coloured letter, sitting on a soft coloured disc.
  * The same picture as the badge at the top and the button on the pad.
- * It can be highlighted (Knappis stands on it) and marked as the target
- * (pulsing glow).
+ * It can be marked as the target (pulsing glow) and shows clearly whether
+ * standing on it is right (big, bright, ringed) or wrong (small, dim).
  */
 export class Tile extends Phaser.GameObjects.Container {
   face: FaceButton;
   private readonly halo: Phaser.GameObjects.Arc;
   private readonly disc: Phaser.GameObjects.Arc;
   private readonly rim: Phaser.GameObjects.Arc;
+  private readonly ring: Phaser.GameObjects.Arc;
   private readonly label: Phaser.GameObjects.Text;
   private readonly theme: SymbolTheme;
   private haloTween: Phaser.Tweens.Tween | null = null;
-  private highlighted = false;
+  private ringTween: Phaser.Tweens.Tween | null = null;
+  private standing: Standing = 'off';
 
   constructor(scene: Phaser.Scene, x: number, y: number, face: FaceButton, theme: SymbolTheme) {
     super(scene, x, y);
@@ -46,6 +56,11 @@ export class Tile extends Phaser.GameObjects.Container {
     this.label = addText(scene, 0, 3, '', { fontSize: '78px', fontStyle: 'bold' });
     this.add(this.label);
 
+    // Thick white ring that pulses while Knappis stands on the right pad.
+    this.ring = scene.add.circle(0, 0, TILE_RADIUS + 2, 0xffffff, 0).setVisible(false);
+    this.ring.setStrokeStyle(10, 0xffffff, 1);
+    this.add(this.ring);
+
     this.setFace(face);
   }
 
@@ -64,15 +79,41 @@ export class Tile extends Phaser.GameObjects.Container {
     return Phaser.Math.Distance.Between(x, y, this.x, this.y) <= TILE_RADIUS;
   }
 
-  setHighlighted(on: boolean): void {
-    if (on === this.highlighted) return;
-    this.highlighted = on;
+  setStanding(standing: Standing): void {
+    if (standing === this.standing) return;
+    this.standing = standing;
+    this.ringTween?.stop();
+    this.ringTween = null;
+    this.ring
+      .setVisible(standing === 'right')
+      .setScale(1)
+      .setAlpha(1);
+
     this.scene.tweens.add({
       targets: this,
-      scale: on ? 1.08 : 1,
-      duration: 140,
-      ease: 'Sine.easeOut',
+      scale: this.restScale(),
+      alpha: standing === 'wrong' ? 0.45 : 1,
+      duration: 160,
+      ease: 'Back.easeOut',
     });
+
+    if (standing === 'right') {
+      this.ringTween = this.scene.tweens.add({
+        targets: this.ring,
+        scale: { from: 1, to: 1.1 },
+        alpha: { from: 1, to: 0.35 },
+        duration: 380,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    } else if (standing === 'wrong') {
+      this.wobble();
+    }
+  }
+
+  private restScale(): number {
+    return this.standing === 'right' ? 1.14 : this.standing === 'wrong' ? 0.92 : 1;
   }
 
   setTarget(on: boolean): void {
@@ -108,7 +149,7 @@ export class Tile extends Phaser.GameObjects.Container {
   pop(): void {
     this.scene.tweens.add({
       targets: this,
-      scale: { from: 1.25, to: this.highlighted ? 1.08 : 1 },
+      scale: { from: 1.3, to: this.restScale() },
       duration: 500,
       ease: 'Back.easeOut',
     });

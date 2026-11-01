@@ -92,7 +92,7 @@ test('an Xbox-style gamepad starts the game and plays a round', async ({ page })
   await page.evaluate((f) => {
     const pos = window.__knappis!.tilePosition!(f)!;
     window.__knappis!.teleport!(pos.x, pos.y);
-  }, s.target);
+  }, s.target!);
   const index = { A: 0, B: 1, X: 2, Y: 3 }[s.target as 'A' | 'B' | 'X' | 'Y'];
   await tap(page, index);
   await expect

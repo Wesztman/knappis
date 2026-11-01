@@ -11,6 +11,7 @@ export interface DebugApi {
   tilePosition?: (face: string) => { x: number; y: number } | null;
   avatar?: () => { x: number; y: number };
   sound?: () => { enabled: boolean; unlocked: boolean };
+  settings?: () => { mode: string; walkSpeed: number };
 }
 
 declare global {

@@ -115,6 +115,37 @@ export class Knappis extends Phaser.GameObjects.Container {
     }, 700);
   }
 
+  /** Quick happy hop: "yes, this pad!". Does not block walking for long. */
+  hop(): Promise<void> {
+    return this.lock((done) => {
+      this.scene.tweens.add({
+        targets: this.torso,
+        y: -62 - 34,
+        duration: 130,
+        ease: 'Quad.easeOut',
+        yoyo: true,
+        onComplete: done,
+      });
+    }, 300);
+  }
+
+  /** Head shake: "no, not that button". */
+  headShake(): Promise<void> {
+    return this.lock((done) => {
+      this.scene.tweens.add({
+        targets: this.torso,
+        angle: { from: -12, to: 12 },
+        duration: 70,
+        yoyo: true,
+        repeat: 3,
+        onComplete: () => {
+          this.torso.setAngle(0);
+          done();
+        },
+      });
+    }, 650);
+  }
+
   /** Little squash: "hm, nothing here". */
   shrug(): Promise<void> {
     return this.lock((done) => {
@@ -148,6 +179,8 @@ export class Knappis extends Phaser.GameObjects.Container {
   }
 
   private lock(run: (done: () => void) => void, fallbackMs: number): Promise<void> {
+    // One reaction at a time; a second one while busy is simply skipped.
+    if (this.busy) return Promise.resolve();
     this.busy = true;
     return new Promise((resolve) => {
       let finished = false;

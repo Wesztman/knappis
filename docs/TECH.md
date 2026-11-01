@@ -89,6 +89,13 @@ interesting logic testable and lets the rendering be swapped later.
   gamepad on the wireless adapter the instant any page called
   `getGamepads()`. Updating Chrome fixed it. Nothing a page can do causes
   this, so the README troubleshooting section points players at the update.
+- Settings (`src/settings.ts`) live in `localStorage` under `knappis.settings`,
+  validated on load. Every game mode implements the `Rules` interface in
+  `src/rules/types.ts`; `createRules` maps the settings value to a class.
+  Modes stay pure TypeScript and unit-tested.
+- Phaser gotcha: inside a Container, an interactive backdrop steals clicks
+  from interactive children, so the settings card has no click catcher. The
+  scene asks `SettingsPanel.containsPoint` and closes on outside clicks.
 - Headless Chromium (Playwright) runs at a low frame rate, so e2e tests use
   the `window.__knappis` debug hooks (dev builds only) to teleport and read
   state instead of timing key holds.

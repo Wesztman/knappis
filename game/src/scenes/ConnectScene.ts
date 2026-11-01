@@ -7,8 +7,11 @@ import { InputService } from '../input/InputService';
 import { setupCamera } from '../render';
 import { strings } from '../strings';
 import { addText } from '../text';
+import { loadSettings, type Settings } from '../settings';
 import { xboxTheme } from '../themes/xbox';
 import { GamepadDiagram } from '../ui/GamepadDiagram';
+import { drawGear, IconButton } from '../ui/IconButton';
+import { SettingsPanel } from '../ui/SettingsPanel';
 import { SoundToggle } from '../ui/SoundToggle';
 
 /**
@@ -22,6 +25,8 @@ export class ConnectScene extends Phaser.Scene {
   private notice!: Phaser.GameObjects.Text;
   private padStatus!: Phaser.GameObjects.Text;
   private sounds!: Sounds;
+  private settingsPanel!: SettingsPanel;
+  private settingsSummary!: Phaser.GameObjects.Text;
   private starting = false;
   private cycleIndex = 0;
 
@@ -77,8 +82,24 @@ export class ConnectScene extends Phaser.Scene {
 
     new SoundToggle(this, GAME_WIDTH - 40, 40, this.sounds);
 
-    this.input.on('pointerdown', () => {
+    // Grown-up settings, top-left: gear plus a one-line summary of what is set.
+    const settings = loadSettings();
+    this.settingsPanel = new SettingsPanel(this, settings, (s) => this.showSummary(s));
+    new IconButton(this, 40, 40, drawGear, () => this.settingsPanel.open());
+    this.settingsSummary = addText(this, 74, 40, '', {
+      fontSize: '20px',
+      color: '#9a8a80',
+    }).setOrigin(0, 0.5);
+    this.showSummary(settings);
+
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.sounds.unlock();
+      if (this.settingsPanel.isOpen) {
+        if (!this.settingsPanel.containsPoint(pointer.worldX, pointer.worldY)) {
+          this.settingsPanel.close();
+        }
+        return;
+      }
       this.begin();
     });
 
@@ -108,6 +129,12 @@ export class ConnectScene extends Phaser.Scene {
       .setColor(kind === 'xbox' ? '#3c8c4a' : '#b3261e');
   }
 
+  private showSummary(settings: Settings): void {
+    this.settingsSummary.setText(
+      strings.settingsSummary(strings.modes[settings.mode], strings.speeds[settings.speed]),
+    );
+  }
+
   private cycleHighlight(): void {
     this.diagram.highlight(FACE_BUTTONS[this.cycleIndex % FACE_BUTTONS.length] ?? 'A');
     this.cycleIndex += 1;
@@ -117,7 +144,8 @@ export class ConnectScene extends Phaser.Scene {
     if (this.starting) return;
     const frame = this.input2.update();
     if (frame.keyboardUsed) this.sounds.unlock();
-    if (frame.anyJustPressed) this.begin();
+    // While the grown-up has the settings open, a stray pad press must not start the game.
+    if (frame.anyJustPressed && !this.settingsPanel.isOpen) this.begin();
   }
 
   private begin(): void {

@@ -37,7 +37,10 @@ symbol you are standing on.
 3. One tile is "asked for": it pulses, and the on-screen pad lights that
    button. Optionally a voice says the colour/letter.
 4. The child walks Knappis onto a tile with the left stick or D-pad.
-   - Standing on any tile highlights it and makes a soft sound.
+   - Standing on the asked-for pad is unmistakable: the pad grows, a bright
+     ring pulses, sparkles fly, Knappis hops and a two-note chime plays.
+   - Standing on another pad: it shrinks and dims, wobbles, Knappis shrugs
+     and a soft low "hmm" plays. Still no fail state.
 5. The child presses a face button.
    - Correct tile **and** correct button → celebration: confetti, jingle,
      Knappis jumps, a star is added to a row at the top.
@@ -79,10 +82,27 @@ then, a non-Xbox pad may work for movement but the pictures will be wrong.
 - Keyboard fallback (arrow keys move, the letters A/B/X/Y press) so the game
   is testable without a pad and playable in a pinch.
 
+## Free play (Mode 0, shipped)
+
+The first tester asked for it: nothing is asked for. The child walks onto
+any pad and presses that pad's button to earn a star. The badge at the top
+is hidden; the gamepad in the corner lights the button of whatever pad
+Knappis stands on, so the pad itself becomes the prompt. Same stars, same
+round-complete dance. Picked in the settings panel.
+
+## Settings (grown-ups only)
+
+A gear on the start screen opens a card with mouse-only choices, remembered
+per browser: walking speed (slow / normal / fast; a 3-year-old found the
+original speed too fast) and game mode (find the button / free play). A home
+button in the room returns to the start screen. The gamepad never operates
+the settings: it stays the child's.
+
 ## Progression of modes (later)
 
 | Mode | Teaches | Idea |
 |------|---------|------|
+| 0. Free play | stick + matching pad to button | shipped, see above |
 | 1. Hitta knappen | stick + 4 face buttons | described above |
 | 2. Två i rad | sequence memory | two symbols shown, press in order (Simon-lite) |
 | 3. Axlarna | shoulder buttons / triggers | tiles for LB/RB, LT/RT |

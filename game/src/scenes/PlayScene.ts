@@ -6,18 +6,19 @@ import type { FaceButton } from '../input/buttons';
 import { InputService } from '../input/InputService';
 import { Knappis } from '../entities/Knappis';
 import { setupCamera } from '../render';
-import { FindTheButton } from '../rules/FindTheButton';
-import type { RulesEvent } from '../rules/types';
+import { createRules } from '../rules/createRules';
+import type { Rules, RulesEvent } from '../rules/types';
+import { loadSettings, WALK_SPEEDS, type GameMode } from '../settings';
 import { addText } from '../text';
 import type { SymbolTheme } from '../themes/types';
 import { xboxTheme } from '../themes/xbox';
 import { GamepadDiagram } from '../ui/GamepadDiagram';
+import { drawHome, IconButton } from '../ui/IconButton';
 import { SoundToggle } from '../ui/SoundToggle';
 import { StarRow } from '../ui/StarRow';
 import { Tile } from '../ui/Tile';
 
-/** Pixels per second at full stick deflection. Slow on purpose. */
-const WALK_SPEED = 230;
+const STARS_PER_ROUND = 5;
 
 const HUD_HEIGHT = 150;
 const ROOM = new Phaser.Geom.Rectangle(
@@ -32,15 +33,19 @@ const ROOM = new Phaser.Geom.Rectangle(
  * Y top, X left, B right, A bottom. The room is a giant button cluster.
  */
 const PAD_CENTRE = { x: GAME_WIDTH / 2, y: 435 };
-const PAD_SPREAD = 192;
+const PAD_SPREAD = 182;
 
 /**
- * Mode 1: "Hitta knappen". Reads input, feeds the rules, renders events.
- * All decisions about what counts as correct live in `FindTheButton`.
+ * The room. Reads input, feeds the rules, renders events. All decisions
+ * about what counts as correct live in the rules object, which is picked
+ * from the settings: "find the button" asks for one pad at a time, "free
+ * play" lets any pad count.
  */
 export class PlayScene extends Phaser.Scene {
   private theme: SymbolTheme = xboxTheme;
-  private rules!: FindTheButton;
+  private rules!: Rules;
+  private mode: GameMode = 'find';
+  private walkSpeed = WALK_SPEEDS.normal;
   private input2!: InputService;
   private sounds!: Sounds;
   private knappis!: Knappis;
@@ -52,6 +57,7 @@ export class PlayScene extends Phaser.Scene {
   private targetDisc!: Phaser.GameObjects.Arc;
   private soundToggle!: SoundToggle;
   private confetti!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private sparkles!: Phaser.GameObjects.Particles.ParticleEmitter;
   private standingOn: Tile | null = null;
   private animating = false;
 
@@ -61,7 +67,10 @@ export class PlayScene extends Phaser.Scene {
 
   create(): void {
     setupCamera(this);
-    this.rules = new FindTheButton({ starsPerRound: 5 });
+    const settings = loadSettings();
+    this.mode = settings.mode;
+    this.walkSpeed = WALK_SPEEDS[settings.speed];
+    this.rules = createRules(settings.mode, STARS_PER_ROUND);
     this.input2 = new InputService(this);
     this.sounds = (this.registry.get('sounds') as Sounds | undefined) ?? new Sounds();
 
@@ -93,6 +102,23 @@ export class PlayScene extends Phaser.Scene {
       emitting: false,
     });
     this.confetti.setDepth(10);
+
+    // Little white sparkles that burst when Knappis steps onto the right pad.
+    this.sparkles = this.add.particles(0, 0, 'dot', {
+      speed: { min: 120, max: 260 },
+      angle: { min: 0, max: 360 },
+      gravityY: -60,
+      lifespan: { min: 350, max: 600 },
+      scale: { start: 0.9, end: 0 },
+      alpha: { start: 1, end: 0 },
+      tint: [0xffffff, 0xfff3b0],
+      emitting: false,
+    });
+    this.sparkles.setDepth(9);
+
+    // Home: back to the start screen, where the settings live. Escape too.
+    new IconButton(this, 40, 40, drawHome, () => this.goHome());
+    this.input.keyboard?.on('keydown-ESC', () => this.goHome());
 
     this.input.on('pointerdown', () => {
       this.sounds.unlock();
@@ -135,6 +161,10 @@ export class PlayScene extends Phaser.Scene {
     this.soundToggle = new SoundToggle(this, GAME_WIDTH - 40, GAME_HEIGHT - 40, this.sounds);
   }
 
+  private goHome(): void {
+    this.scene.start('Connect');
+  }
+
   override update(_time: number, delta: number): void {
     const frame = this.input2.update();
     if (frame.keyboardUsed && !this.sounds.unlocked) {
@@ -147,12 +177,12 @@ export class PlayScene extends Phaser.Scene {
     const speed = Math.hypot(frame.move.x, frame.move.y);
     if (!this.animating && speed > 0) {
       this.knappis.x = Phaser.Math.Clamp(
-        this.knappis.x + frame.move.x * WALK_SPEED * dt,
+        this.knappis.x + frame.move.x * this.walkSpeed * dt,
         ROOM.left,
         ROOM.right,
       );
       this.knappis.y = Phaser.Math.Clamp(
-        this.knappis.y + frame.move.y * WALK_SPEED * dt,
+        this.knappis.y + frame.move.y * this.walkSpeed * dt,
         ROOM.top,
         ROOM.bottom,
       );
@@ -163,24 +193,46 @@ export class PlayScene extends Phaser.Scene {
     this.updateStanding();
 
     // Teach in two steps: pulse the stick until Knappis is on the right
-    // tile, then pulse the button.
+    // tile, then pulse the button. In free play the "right" tile is
+    // whichever one Knappis stands on, so the pad in the corner follows.
     this.diagram.setStick(frame.move.x, frame.move.y);
     if (!this.animating && this.rules.state.phase === 'playing') {
-      this.diagram.setStep(this.standingOn?.face === this.rules.state.target ? 'press' : 'move');
+      if (this.mode === 'free') this.diagram.highlight(this.standingOn?.face ?? null);
+      this.diagram.setStep(this.standingOn && this.isRight(this.standingOn) ? 'press' : 'move');
     }
 
     for (const face of frame.justPressed) this.handlePress(face);
   }
 
+  /** Is standing on this pad the thing to do right now? */
+  private isRight(tile: Tile): boolean {
+    const target = this.rules.state.target;
+    return target === null || tile.face === target;
+  }
+
   private updateStanding(): void {
     const now = this.tiles.find((t) => t.contains(this.knappis.x, this.knappis.y)) ?? null;
     if (now === this.standingOn) return;
-    this.standingOn?.setHighlighted(false);
+    this.standingOn?.setStanding('off');
     this.standingOn = now;
-    if (now) {
-      now.setHighlighted(true);
-      this.sounds.step();
+    if (!now) return;
+    // Loud and clear, because a quiet highlight was lost on our first tester.
+    if (this.isRight(now)) {
+      now.setStanding('right');
+      this.sparkles.explode(16, now.x, now.y - 10);
+      this.sounds.onTarget();
+      void this.knappis.hop();
+    } else {
+      now.setStanding('wrong');
+      this.sounds.hmm();
+      void this.knappis.shrug();
     }
+  }
+
+  /** After the target moved: re-judge the pad Knappis is still standing on, quietly. */
+  private rejudgeStanding(): void {
+    if (this.standingOn)
+      this.standingOn.setStanding(this.isRight(this.standingOn) ? 'right' : 'wrong');
   }
 
   private handlePress(face: FaceButton): void {
@@ -199,12 +251,14 @@ export class PlayScene extends Phaser.Scene {
         this.sounds.gentleNo();
         this.tileFor(e.standingOn)?.wobble();
         this.flashTarget();
+        void this.knappis.headShake();
         return;
       case 'wrongButton':
         this.sounds.gentleNo();
         this.flashTarget();
+        void this.knappis.headShake();
         this.diagram.highlight(null);
-        this.time.delayedCall(250, () => this.diagram.highlight(this.rules.state.target));
+        this.time.delayedCall(250, () => this.diagram.highlight(e.target));
         return;
       case 'correct': {
         this.animating = true;
@@ -222,6 +276,7 @@ export class PlayScene extends Phaser.Scene {
       }
       case 'newTarget':
         this.showTarget(e.target);
+        this.rejudgeStanding();
         return;
       case 'roundComplete': {
         this.animating = true;
@@ -252,9 +307,11 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
-  private showTarget(face: FaceButton): void {
+  private showTarget(face: FaceButton | null): void {
     for (const t of this.tiles) t.setTarget(t.face === face);
     this.diagram.highlight(face);
+    this.targetBadge.setVisible(face !== null);
+    if (face === null) return;
     const style = this.theme.buttons[face];
     this.targetLabel.setText(style.label).setColor(style.colourCss);
     this.tweens.add({
@@ -277,7 +334,10 @@ export class PlayScene extends Phaser.Scene {
 
   /** Between rounds: a quick bounce, and re-label if the rules shuffled. */
   private async refreshTiles(faces: readonly FaceButton[]): Promise<void> {
-    this.tiles.forEach((t, i) => t.setFace(faces[i] ?? 'A'));
+    this.tiles.forEach((t, i) => {
+      t.setFace(faces[i] ?? 'A');
+      t.setStanding('off');
+    });
     this.standingOn = null;
     await new Promise<void>((resolve) =>
       this.tweens.add({
@@ -312,6 +372,7 @@ export class PlayScene extends Phaser.Scene {
       },
       avatar: () => ({ x: this.knappis.x, y: this.knappis.y }),
       sound: () => ({ enabled: this.sounds.enabled, unlocked: this.sounds.unlocked }),
+      settings: () => ({ mode: this.mode, walkSpeed: this.walkSpeed }),
     });
   }
 }

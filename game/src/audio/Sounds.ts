@@ -73,6 +73,17 @@ export class Sounds {
     this.tone(523.25, 0.08, 0.12, 'sine');
   }
 
+  /** Bright two-note "yes, here!" when stepping onto the right pad. */
+  onTarget(): void {
+    this.tone(783.99, 0.1, 0.16, 'triangle', 0);
+    this.tone(1046.5, 0.18, 0.16, 'triangle', 0.09);
+  }
+
+  /** Soft, low "hmm" when stepping onto a pad that is not the one asked for. */
+  hmm(): void {
+    this.tone(261.63, 0.22, 0.08, 'sine', 0, 233.08);
+  }
+
   /** Rising arpeggio for a correct press. */
   correct(): void {
     this.tone(523.25, 0.12, 0.2, 'triangle', 0);

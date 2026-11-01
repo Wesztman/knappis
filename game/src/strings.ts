@@ -16,4 +16,16 @@ export const strings = {
   padSeen: 'Gamepad: ',
   padInsecure:
     'Gamepads only work on http://localhost or https. Open http://localhost:5173 instead.',
+  settingsTitle: 'Settings',
+  speedLabel: 'Walking speed',
+  speeds: { slow: 'Slow', normal: 'Normal', fast: 'Fast' },
+  modeLabel: 'Game',
+  modes: { find: 'Find the button', free: 'Free play' },
+  modeHints: {
+    find: 'One button is asked for at a time: walk to its pad and press it.',
+    free: 'Nothing is asked for: walk onto any pad and press that pad’s button.',
+  },
+  done: 'Done',
+  /** Shown next to the gear so the grown-up sees what is set without opening it. */
+  settingsSummary: (mode: string, speed: string) => `Settings  ·  ${mode}  ·  ${speed} speed`,
 };

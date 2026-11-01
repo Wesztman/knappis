@@ -1,5 +1,5 @@
 import { FACE_BUTTONS, type FaceButton } from '../input/buttons';
-import type { Phase, RulesEvent, RulesState } from './types';
+import type { Phase, Rules, RulesEvent, RulesState } from './types';
 
 export interface FindTheButtonOptions {
   starsPerRound?: number;
@@ -13,6 +13,8 @@ export interface FindTheButtonOptions {
   random?: () => number;
 }
 
+export type FindTheButtonState = RulesState & { readonly target: FaceButton };
+
 /**
  * Pure state machine for Mode 1, "Hitta knappen".
  *
@@ -23,7 +25,7 @@ export interface FindTheButtonOptions {
  *                                         \--advance--> roundComplete (if enough stars)
  *        roundComplete --advance--> playing (new round, shuffled tiles)
  */
-export class FindTheButton {
+export class FindTheButton implements Rules {
   private tiles: FaceButton[];
   private target: FaceButton;
   private stars = 0;
@@ -41,7 +43,8 @@ export class FindTheButton {
     this.target = this.pickTarget(null);
   }
 
-  get state(): RulesState {
+  /** Same as `RulesState`, but this mode always has a target. */
+  get state(): FindTheButtonState {
     return {
       tiles: this.tiles,
       target: this.target,
