@@ -31,11 +31,12 @@ to discover gamepads. Fix, in a Windows terminal:
 winget update Microsoft.GameInput
 ```
 
-Then restart the gamepad and reload. If no update is offered, open
-Services, stop "GameInput Service", set its startup type to Disabled and
-reboot. Quick way to tell this apart from a hardware fault: a USB cable
-works, and the Xbox Accessories app works, while every gamepad web page
-kills the pad.
+Then **reboot Windows**; the running service keeps the old files loaded
+until you do, and the fix does not take before that. Confirmed working here
+after the reboot (GameInput 4.0.302). If it still fails, open Services, stop
+"GameInput Service", set its startup type to Disabled and reboot again.
+Quick way to tell this apart from a hardware fault: a USB cable works, and
+the Xbox Accessories app works, while every gamepad web page kills the pad.
 
 **Nothing happens when a button is pressed.** Chrome only reveals a gamepad
 after its first button press, and the page needs a secure context

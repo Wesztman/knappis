@@ -88,7 +88,7 @@ interesting logic testable and lets the rendering be swapped later.
 - Seen once (Nov 2026): a buggy Microsoft GameInput runtime update made an
   Xbox gamepad on the wireless adapter power off the instant any page first
   called `getGamepads()` (any browser, any program; cable unaffected).
-  `winget update Microsoft.GameInput` fixed it. Nothing a page can do causes
+  `winget update Microsoft.GameInput` plus a Windows reboot fixed it. Nothing a page can do causes
   this; the README troubleshooting section carries the fix.
 - Settings (`src/settings.ts`) live in `localStorage` under `knappis.settings`,
   validated on load. Every game mode implements the `Rules` interface in
