@@ -51,8 +51,8 @@ export class ConnectScene extends Phaser.Scene {
     this.time.addEvent({ delay: 500, loop: true, callback: () => this.cycleHighlight() });
     this.cycleHighlight();
 
-    addText(this, GAME_WIDTH / 2, 520, strings.pressAnyButton, { fontSize: '34px' });
-    addText(this, GAME_WIDTH / 2, 570, strings.orKeyboard, { fontSize: '24px', color: '#7a6a60' });
+    addText(this, GAME_WIDTH / 2, 548, strings.pressAnyButton, { fontSize: '34px' });
+    addText(this, GAME_WIDTH / 2, 594, strings.orKeyboard, { fontSize: '24px', color: '#7a6a60' });
     addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 30, strings.keyboardHelp, {
       fontSize: '20px',
       color: '#9a8a80',
@@ -67,7 +67,7 @@ export class ConnectScene extends Phaser.Scene {
     this.time.addEvent({ delay: 250, loop: true, callback: () => this.refreshPadStatus() });
     this.refreshPadStatus();
 
-    this.notice = addText(this, GAME_WIDTH / 2, 640, strings.nonXboxNotice, {
+    this.notice = addText(this, GAME_WIDTH / 2, 645, strings.nonXboxNotice, {
       fontSize: '26px',
       color: '#b3261e',
       backgroundColor: '#ffe6e3',
