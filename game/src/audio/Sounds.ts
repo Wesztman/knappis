@@ -1,3 +1,13 @@
+const STORAGE_KEY = 'knappis.sound';
+
+function readPreference(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
 /**
  * Tiny WebAudio synth so the game has sound before any assets exist.
  * Soft marimba-ish tones only; nothing harsh.
@@ -7,12 +17,34 @@
  */
 export class Sounds {
   private ctx: AudioContext | null = null;
+  private _enabled = readPreference();
+  private gestureSeen = false;
 
+  /**
+   * A click or key press has happened, so the browser allows audio. Tracked
+   * ourselves rather than via AudioContext.state, which can stay suspended
+   * where there is no audio device (headless test browsers, some VMs).
+   */
   get unlocked(): boolean {
-    return this.ctx?.state === 'running';
+    return this.gestureSeen;
+  }
+
+  /** The player's on/off choice. Default on; remembered per browser. */
+  get enabled(): boolean {
+    return this._enabled;
+  }
+
+  setEnabled(on: boolean): void {
+    this._enabled = on;
+    try {
+      localStorage.setItem(STORAGE_KEY, on ? '1' : '0');
+    } catch {
+      // Private mode or blocked storage: the choice just lasts this session.
+    }
   }
 
   unlock(): void {
+    this.gestureSeen = true;
     if (!this.ctx) {
       const Ctor =
         window.AudioContext ??
@@ -62,7 +94,7 @@ export class Sounds {
     glideTo?: number,
   ): void {
     const ctx = this.ctx;
-    if (!ctx || ctx.state !== 'running') return;
+    if (!this._enabled || !ctx || ctx.state !== 'running') return;
     const t0 = ctx.currentTime + delay;
     const osc = ctx.createOscillator();
     const env = ctx.createGain();

@@ -10,7 +10,7 @@ export const strings = {
   orKeyboard: 'or press a key',
   nonXboxNotice:
     'Only Xbox-style gamepads are supported right now. The pictures may not match this one.',
-  clickForSound: 'Click the screen for sound',
+  clickForSound: 'click for sound',
   footer: `v${__APP_VERSION__}  ·  Xbox-style gamepads only for now  ·  Keyboard: arrow keys walk, A B X Y press`,
   padNone:
     'No gamepad detected yet. The browser only reveals it on the first button press, which also starts the game.',

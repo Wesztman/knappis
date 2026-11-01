@@ -8,11 +8,11 @@ import { Knappis } from '../entities/Knappis';
 import { setupCamera } from '../render';
 import { FindTheButton } from '../rules/FindTheButton';
 import type { RulesEvent } from '../rules/types';
-import { strings } from '../strings';
 import { addText } from '../text';
 import type { SymbolTheme } from '../themes/types';
 import { xboxTheme } from '../themes/xbox';
 import { GamepadDiagram } from '../ui/GamepadDiagram';
+import { SoundToggle } from '../ui/SoundToggle';
 import { StarRow } from '../ui/StarRow';
 import { Tile } from '../ui/Tile';
 
@@ -51,7 +51,7 @@ export class PlayScene extends Phaser.Scene {
   private targetBadge!: Phaser.GameObjects.Container;
   private targetLabel!: Phaser.GameObjects.Text;
   private targetDisc!: Phaser.GameObjects.Arc;
-  private soundHint!: Phaser.GameObjects.Text;
+  private soundToggle!: SoundToggle;
   private confetti!: Phaser.GameObjects.Particles.ParticleEmitter;
   private standingOn: Tile | null = null;
   private animating = false;
@@ -91,7 +91,7 @@ export class PlayScene extends Phaser.Scene {
 
     this.input.on('pointerdown', () => {
       this.sounds.unlock();
-      this.soundHint.setVisible(false);
+      this.soundToggle.refresh();
     });
 
     this.showTarget(this.rules.state.target);
@@ -134,17 +134,14 @@ export class PlayScene extends Phaser.Scene {
 
     this.diagram = new GamepadDiagram(this, GAME_WIDTH - 120, HUD_HEIGHT / 2, this.theme, 0.8);
 
-    this.soundHint = addText(this, GAME_WIDTH / 2, GAME_HEIGHT - 24, strings.clickForSound, {
-      fontSize: '20px',
-      color: '#9a8a80',
-    }).setVisible(!this.sounds.unlocked);
+    this.soundToggle = new SoundToggle(this, GAME_WIDTH - 40, GAME_HEIGHT - 40, this.sounds);
   }
 
   override update(_time: number, delta: number): void {
     const frame = this.input2.update();
     if (frame.keyboardUsed && !this.sounds.unlocked) {
       this.sounds.unlock();
-      this.soundHint.setVisible(false);
+      this.soundToggle.refresh();
     }
 
     // Movement
@@ -325,6 +322,7 @@ export class PlayScene extends Phaser.Scene {
         return t ? { x: t.x, y: t.y } : null;
       },
       avatar: () => ({ x: this.knappis.x, y: this.knappis.y }),
+      sound: () => ({ enabled: this.sounds.enabled, unlocked: this.sounds.unlocked }),
     });
   }
 }

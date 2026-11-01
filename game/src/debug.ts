@@ -10,6 +10,7 @@ export interface DebugApi {
   teleport?: (x: number, y: number) => void;
   tilePosition?: (face: string) => { x: number; y: number } | null;
   avatar?: () => { x: number; y: number };
+  sound?: () => { enabled: boolean; unlocked: boolean };
 }
 
 declare global {

@@ -9,6 +9,7 @@ import { strings } from '../strings';
 import { addText } from '../text';
 import { xboxTheme } from '../themes/xbox';
 import { GamepadDiagram } from '../ui/GamepadDiagram';
+import { SoundToggle } from '../ui/SoundToggle';
 
 /**
  * "Press any button". Exists because browsers only expose a gamepad after
@@ -73,6 +74,8 @@ export class ConnectScene extends Phaser.Scene {
       backgroundColor: '#ffe6e3',
       padding: { x: 16, y: 8 },
     }).setVisible(false);
+
+    new SoundToggle(this, GAME_WIDTH - 40, 40, this.sounds);
 
     this.input.on('pointerdown', () => {
       this.sounds.unlock();
