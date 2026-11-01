@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Gamepad switches off when the page opens
+    url: https://github.com/Wesztman/knappis/blob/main/README.md#troubleshooting
+    about: Known Windows issue with the Xbox Wireless Adapter, not the game. Use a USB cable or Bluetooth.

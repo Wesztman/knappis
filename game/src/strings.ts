@@ -12,7 +12,8 @@ export const strings = {
     'Only Xbox-style gamepads are supported right now. The pictures may not match this one.',
   footer: `v${__APP_VERSION__}  ·  Xbox-style gamepads only for now  ·  Keyboard: arrow keys walk, A B X Y press`,
   padNone:
-    'No gamepad detected yet. The browser only reveals it on the first button press, which also starts the game.',
+    'No gamepad detected yet. The browser only reveals it on the first button press, which also starts the game.\n' +
+    'Gamepad switched itself off just now? Known Windows issue with the Xbox Wireless Adapter: use a USB cable or Bluetooth.',
   padSeen: 'Gamepad: ',
   padInsecure:
     'Gamepads only work on http://localhost or https. Open http://localhost:5173 instead.',

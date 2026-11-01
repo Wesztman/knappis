@@ -1,0 +1,37 @@
+name: Bug report
+description: Something in Knappis does not work
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. One known problem first, because it looks like a game bug but is not:
+        **if your Xbox gamepad switches itself off the moment the page opens** (and will not turn on
+        again until you pull the batteries), that is a Windows problem with the Xbox Wireless Adapter.
+        The game cannot cause or fix it. Use a USB cable or Bluetooth. Details in the
+        [README troubleshooting section](../blob/main/README.md#troubleshooting).
+  - type: dropdown
+    id: shutoff
+    attributes:
+      label: Does your gamepad switch off when the page opens?
+      options:
+        - "No, this is something else"
+        - "Yes, and a USB cable or Bluetooth does not help either"
+        - "Yes, and a cable or Bluetooth works (then please do not file this; see the README)"
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Setup
+      description: Browser and version, Windows/macOS/Linux, gamepad model, wireless adapter / Bluetooth / cable
+      placeholder: Chrome 156, Windows 11, Xbox Series gamepad on USB cable
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: The start screen prints what the browser sees under "Gamepad:" - please include that line.
+    validations:
+      required: true

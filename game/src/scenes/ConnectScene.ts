@@ -72,6 +72,7 @@ export class ConnectScene extends Phaser.Scene {
     this.padStatus = addText(this, GAME_WIDTH / 2, 640, '', {
       fontSize: '20px',
       color: '#9a8a80',
+      align: 'center',
     });
     this.time.addEvent({ delay: 250, loop: true, callback: () => this.refreshPadStatus() });
     this.refreshPadStatus();
