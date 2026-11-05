@@ -43,6 +43,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 
 ## M4 – More modes
 - [x] Free play: no target, any pad counts, press that pad's button (asked for by the first tester)
+- [x] Paint: no pads, each button splats its colour on the floor; fading footprints while walking
 - [ ] Mode 2: two-in-a-row sequence
 - [ ] Mode 3: shoulder buttons & triggers
 - [ ] Mode select screen with pictures, no text

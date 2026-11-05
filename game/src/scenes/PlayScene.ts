@@ -4,7 +4,9 @@ import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { setDebug } from '../debug';
 import type { FaceButton } from '../input/buttons';
 import { InputService } from '../input/InputService';
+import { Footprints } from '../entities/Footprints';
 import { Knappis } from '../entities/Knappis';
+import { PaintCanvas } from '../entities/PaintCanvas';
 import { setupCamera } from '../render';
 import { createRules } from '../rules/createRules';
 import type { Rules, RulesEvent } from '../rules/types';
@@ -37,7 +39,8 @@ const PAD_SPREAD = 182;
  * The room. Reads input, feeds the rules, renders events. All decisions
  * about what counts as correct live in the rules object, which is picked
  * from the settings: "find the button" asks for one pad at a time, "free
- * play" lets any pad count.
+ * play" lets any pad count, "paint" has no pads and every press leaves a
+ * splat of the button's colour where Knappis stands.
  */
 export class PlayScene extends Phaser.Scene {
   private theme: SymbolTheme = xboxTheme;
@@ -58,6 +61,10 @@ export class PlayScene extends Phaser.Scene {
   private sparkles!: Phaser.GameObjects.Particles.ParticleEmitter;
   private standingOn: Tile | null = null;
   private animating = false;
+  /** Paint mode only: the painting and the fading footprints. */
+  private paint: PaintCanvas | null = null;
+  private footprints: Footprints | null = null;
+  private drops: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
 
   constructor() {
     super('Play');
@@ -77,6 +84,7 @@ export class PlayScene extends Phaser.Scene {
 
     this.drawRoom();
     this.buildHud();
+    this.buildPaintFloor();
 
     this.tiles = this.rules.state.tiles.map((face) => {
       const off = this.theme.layout[face];
@@ -121,6 +129,9 @@ export class PlayScene extends Phaser.Scene {
     new IconButton(this, 40, 40, drawHome, () => this.goHome());
     this.input.keyboard?.on('keydown-ESC', () => this.goHome());
 
+    // A mode without rounds has nothing to count: hide the star row.
+    this.stars.setVisible(this.rules.state.starsPerRound > 0);
+
     this.input.on('pointerdown', () => {
       this.sounds.unlock();
       this.soundToggle.refresh();
@@ -144,6 +155,32 @@ export class PlayScene extends Phaser.Scene {
         g.fillCircle(x, y, 4);
       }
     }
+  }
+
+  /**
+   * Paint mode floor: the painting below, footprints above it, both under
+   * Knappis (whose depth is its y, well above these). Other modes get
+   * neither; the footprints are tried here first so they can be judged
+   * before spreading to the lessons.
+   */
+  private buildPaintFloor(): void {
+    this.paint = null;
+    this.footprints = null;
+    this.drops = null;
+    if (this.mode !== 'paint') return;
+    this.paint = new PaintCanvas(this, this.theme, GAME_WIDTH, GAME_HEIGHT, 1);
+    this.footprints = new Footprints(this, 2);
+    // Coloured drops that fly up when a splat lands; tinted per press.
+    this.drops = this.add.particles(0, 0, 'dot', {
+      speed: { min: 140, max: 300 },
+      angle: { min: 200, max: 340 },
+      gravityY: 700,
+      lifespan: { min: 350, max: 600 },
+      scale: { start: 0.7, end: 0.1 },
+      alpha: { start: 1, end: 0 },
+      emitting: false,
+    });
+    this.drops.setDepth(9);
   }
 
   private buildHud(): void {
@@ -193,6 +230,7 @@ export class PlayScene extends Phaser.Scene {
     }
     this.knappis.animate(delta, this.animating ? 0 : speed, frame.move.x);
     this.knappis.setDepth(this.knappis.y);
+    this.footprints?.update(this.knappis.x, this.knappis.y);
 
     this.updateStanding();
 
@@ -246,6 +284,18 @@ export class PlayScene extends Phaser.Scene {
 
   private async render(e: RulesEvent): Promise<void> {
     switch (e.type) {
+      case 'paint': {
+        const colour = this.theme.buttons[e.button].colour;
+        this.sounds.paint(e.button);
+        this.paint?.splat(this.knappis.x, this.knappis.y, e.button);
+        this.drops?.setParticleTint(colour);
+        this.drops?.explode(10, this.knappis.x, this.knappis.y - 10);
+        // Light the pressed button on the corner gamepad for a moment.
+        this.diagram.highlight(e.button);
+        this.time.delayedCall(300, () => this.diagram.highlight(null));
+        void this.knappis.hop();
+        return;
+      }
       case 'notOnTile':
         this.sounds.boing();
         this.flashTarget();
@@ -381,6 +431,10 @@ export class PlayScene extends Phaser.Scene {
       avatar: () => ({ x: this.knappis.x, y: this.knappis.y }),
       sound: () => ({ enabled: this.sounds.enabled, unlocked: this.sounds.unlocked }),
       settings: () => ({ mode: this.mode, walkSpeed: this.walkSpeed }),
+      paint: () => ({
+        splats: this.paint?.splats ?? 0,
+        footprints: this.footprints?.count ?? 0,
+      }),
     });
   }
 }

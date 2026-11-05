@@ -18,6 +18,8 @@ export interface RulesState {
 
 export type RulesEvent =
   | { type: 'correct'; button: FaceButton; stars: number }
+  /** Paint mode: leave a splat of this button's colour where Knappis stands. */
+  | { type: 'paint'; button: FaceButton; splats: number }
   /** Right pad, wrong button. `target` is the button that was wanted. */
   | { type: 'wrongButton'; standingOn: FaceButton; pressed: FaceButton; target: FaceButton }
   | { type: 'wrongTile'; standingOn: FaceButton; pressed: FaceButton; target: FaceButton }

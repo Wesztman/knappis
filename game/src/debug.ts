@@ -12,6 +12,8 @@ export interface DebugApi {
   avatar?: () => { x: number; y: number };
   sound?: () => { enabled: boolean; unlocked: boolean };
   settings?: () => { mode: string; walkSpeed: number };
+  /** Paint mode: how many splats and live footprints are on the floor. */
+  paint?: () => { splats: number; footprints: number };
 }
 
 declare global {

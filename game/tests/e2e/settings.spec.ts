@@ -19,9 +19,10 @@ test('the gear opens settings; speed and mode are saved and used by the game', a
   await boot(page);
   // Gear sits top-left on the start screen.
   await page.mouse.click(40, 40);
-  // Card is centred at (640, 380): speed pills on row y=320, mode pills on y=450, Done at y=565.
+  // Card is centred at (640, 380): speed pills on row y=320, mode pills on y=450
+  // (find 400, free 640, paint 880), Done at y=565.
   await page.mouse.click(440, 320); // Slow
-  await page.mouse.click(800, 450); // Free play
+  await page.mouse.click(640, 450); // Free play
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('knappis.settings')))
     .toBe(JSON.stringify({ speed: 'slow', mode: 'free' }));

@@ -75,11 +75,11 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
         color: '#7a6a60',
       }).setOrigin(0, 0.5),
     );
-    const modeXs: Record<GameMode, number> = { find: -160, free: 160 };
+    const modeXs: Record<GameMode, number> = { find: -240, free: 0, paint: 240 };
     this.modePills = Object.fromEntries(
       GAME_MODES.map((mode) => [
         mode,
-        new PillButton(scene, modeXs[mode], 70, 300, 56, strings.modes[mode], () =>
+        new PillButton(scene, modeXs[mode], 70, 224, 56, strings.modes[mode], () =>
           this.apply({ mode }),
         ),
       ]),

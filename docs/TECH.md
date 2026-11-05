@@ -96,7 +96,14 @@ interesting logic testable and lets the rendering be swapped later.
 - Settings (`src/settings.ts`) live in `localStorage` under `knappis.settings`,
   validated on load. Every game mode implements the `Rules` interface in
   `src/rules/types.ts`; `createRules` maps the settings value to a class.
-  Modes stay pure TypeScript and unit-tested.
+  Modes stay pure TypeScript and unit-tested. A mode with no pads returns
+  an empty `tiles` list and `starsPerRound: 0`; the scene then draws no
+  tiles and hides the star row.
+- Paint mode stamps splats into one `RenderTexture` (`src/entities/PaintCanvas.ts`)
+  rather than keeping a game object per splat, so the painting never slows
+  down however long the child keeps going. The white `splat` texture is
+  generated at boot and tinted per stamp. Footprints (`src/entities/Footprints.ts`)
+  are short-lived images with an alpha tween; a handful are alive at a time.
 - Phaser gotcha: inside a Container, an interactive backdrop steals clicks
   from interactive children, so the settings card has no click catcher. The
   scene asks `SettingsPanel.containsPoint` and closes on outside clicks.

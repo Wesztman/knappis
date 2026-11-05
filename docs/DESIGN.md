@@ -92,11 +92,28 @@ is hidden; the gamepad in the corner lights the button of whatever pad
 Knappis stands on, so the pad itself becomes the prompt. Four gold stars
 make a round, same round-complete dance. Picked in the settings panel.
 
+## Paint (shipped)
+
+No pads at all. Knappis walks around a blank floor and every face button
+leaves a splat of its own colour where Knappis stands: the Xbox buttons
+already come in four colours, so the colour you paint with is the colour
+of the button you press, with no explaining needed. The gamepad in the
+corner lights the pressed button for a moment, a few drops fly up and a
+note plays (one per colour, so painting makes a little tune). Nothing
+fades and nothing is counted; the painting stays until you go home, and
+coming back gives a clean sheet.
+
+Paint is also where footprints live: while walking, Knappis leaves small
+prints that fade out over a few seconds. They give the stick feedback
+before any button is pressed. Paint mode only for now, to see whether they
+distract from the lessons before they spread to other modes.
+
 ## Settings (grown-ups only)
 
 A gear on the start screen opens a card with mouse-only choices, remembered
 per browser: walking speed (slow / normal / fast; a 3-year-old found the
-original speed too fast) and game mode (find the button / free play). A home
+original speed too fast) and game mode (find the button / free play /
+paint). A home
 button in the room returns to the start screen. The gamepad never operates
 the settings: it stays the child's.
 
@@ -106,6 +123,7 @@ the settings: it stays the child's.
 |------|---------|------|
 | 0. Free play | stick + matching pad to button | shipped, see above |
 | 1. Hitta knappen | stick + 4 face buttons | described above |
+| Paint | stick + buttons as colours | shipped, see above |
 | 2. Två i rad | sequence memory | two symbols shown, press in order (Simon-lite) |
 | 3. Axlarna | shoulder buttons / triggers | tiles for LB/RB, LT/RT |
 | 4. Hoppa | jump timing | press A to hop over a slow-rolling ball |

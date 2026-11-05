@@ -21,10 +21,11 @@ export const strings = {
   speedLabel: 'Walking speed',
   speeds: { slow: 'Slow', normal: 'Normal', fast: 'Fast' },
   modeLabel: 'Game',
-  modes: { find: 'Find the button', free: 'Free play' },
+  modes: { find: 'Find the button', free: 'Free play', paint: 'Paint' },
   modeHints: {
     find: 'One button is asked for at a time: walk to its pad and press it.',
     free: 'Nothing is asked for: walk onto any pad and press that pad’s button.',
+    paint: 'No pads: walk around and press a button to leave a splat of its colour.',
   },
   done: 'Done',
   /** Shown next to the gear so the grown-up sees what is set without opening it. */

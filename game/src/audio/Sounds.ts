@@ -1,3 +1,5 @@
+import type { FaceButton } from '../input/buttons';
+
 const STORAGE_KEY = 'knappis.sound';
 
 function readPreference(): boolean {
@@ -78,6 +80,16 @@ export class Sounds {
   tryResume(): void {
     this.ctx ??= createContext();
     if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume().catch(() => undefined);
+  }
+
+  /**
+   * Paint mode: a soft "plop" per splat, one note per button so painting
+   * plays a little tune. C D E G: any order sounds fine.
+   */
+  paint(button: FaceButton): void {
+    const notes: Record<FaceButton, number> = { A: 523.25, B: 587.33, X: 659.25, Y: 783.99 };
+    const f = notes[button];
+    this.tone(f * 1.25, 0.2, 0.16, 'triangle', 0, f);
   }
 
   /** Soft tap when stepping onto a tile. */
