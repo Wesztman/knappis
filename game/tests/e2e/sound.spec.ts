@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { boot, enterGame } from './helpers';
 
 // Viewport matches the game's 16:9 design, so page pixels equal game units.
 test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
@@ -6,10 +7,8 @@ test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 const sound = (page: Page) => page.evaluate(() => window.__knappis!.sound!());
 
 test('the speaker icon toggles sound and the choice is remembered', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
+  await boot(page);
+  await enterGame(page);
 
   // Default: on. The key press above also counts as the browser's user gesture.
   await expect.poll(async () => (await sound(page)).enabled).toBe(true);
@@ -25,7 +24,6 @@ test('the speaker icon toggles sound and the choice is remembered', async ({ pag
   await expect.poll(async () => (await sound(page)).enabled).toBe(false);
   await page.reload();
   await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
+  await enterGame(page);
   expect((await sound(page)).enabled).toBe(false);
 });

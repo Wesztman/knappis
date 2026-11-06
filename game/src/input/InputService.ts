@@ -10,14 +10,18 @@ import {
 } from './buttons';
 import { applyDeadZone, combineMoves, type Vec2 } from './deadzone';
 
+type Key = Phaser.Input.Keyboard.Key;
+
 export interface PadInfo {
   id: string;
   kind: GamepadKind;
 }
 
 export interface InputFrame {
-  /** Movement direction, length 0..1. */
+  /** Movement direction (left stick, D-pad, arrow keys), length 0..1. */
   move: Vec2;
+  /** Look direction (right stick, I J K L keys), length 0..1. Lamp mode. */
+  look: Vec2;
   /** Face buttons that went down this frame. */
   justPressed: FaceButton[];
   /** Any gamepad button or keyboard key went down this frame. */
@@ -36,12 +40,13 @@ export interface InputFrame {
  * going direct removes a layer that has had timing quirks across browsers.
  *
  * Keyboard fallback: arrow keys move, the letters A/B/X/Y press the
- * matching face button.
+ * matching face button, and I/J/K/L stand in for the right stick.
  */
 export class InputService {
   private readonly cursors: Phaser.Types.Input.Keyboard.CursorKeys | null;
   private readonly letterKeys: Record<FaceButton, Phaser.Input.Keyboard.Key> | null;
   private readonly anyKey: Phaser.Input.Keyboard.Key[];
+  private readonly lookKeys: { up: Key; left: Key; down: Key; right: Key } | null;
   private prevPadButtons = new Set<number>();
   private prevPadIndex = -1;
 
@@ -54,6 +59,14 @@ export class InputService {
           B: kb.addKey(Phaser.Input.Keyboard.KeyCodes.B),
           X: kb.addKey(Phaser.Input.Keyboard.KeyCodes.X),
           Y: kb.addKey(Phaser.Input.Keyboard.KeyCodes.Y),
+        }
+      : null;
+    this.lookKeys = kb
+      ? {
+          up: kb.addKey(Phaser.Input.Keyboard.KeyCodes.I),
+          left: kb.addKey(Phaser.Input.Keyboard.KeyCodes.J),
+          down: kb.addKey(Phaser.Input.Keyboard.KeyCodes.K),
+          right: kb.addKey(Phaser.Input.Keyboard.KeyCodes.L),
         }
       : null;
     this.anyKey = kb
@@ -94,6 +107,7 @@ export class InputService {
 
     // --- gamepad ---
     let stick: Vec2 = { x: 0, y: 0 };
+    let rightStick: Vec2 = { x: 0, y: 0 };
     let dpad: Vec2 = { x: 0, y: 0 };
     if (pad) {
       if (pad.index !== this.prevPadIndex) {
@@ -102,6 +116,7 @@ export class InputService {
         this.prevPadIndex = pad.index;
       }
       stick = applyDeadZone(pad.axes[0] ?? 0, pad.axes[1] ?? 0);
+      rightStick = applyDeadZone(pad.axes[2] ?? 0, pad.axes[3] ?? 0);
       const down = (i: number) => pad.buttons[i]?.pressed ?? false;
       dpad = {
         x: (down(DPAD_INDEX.right) ? 1 : 0) - (down(DPAD_INDEX.left) ? 1 : 0),
@@ -133,6 +148,13 @@ export class InputService {
         y: (this.cursors.down.isDown ? 1 : 0) - (this.cursors.up.isDown ? 1 : 0),
       };
     }
+    let lookKeys: Vec2 = { x: 0, y: 0 };
+    if (this.lookKeys) {
+      lookKeys = {
+        x: (this.lookKeys.right.isDown ? 1 : 0) - (this.lookKeys.left.isDown ? 1 : 0),
+        y: (this.lookKeys.down.isDown ? 1 : 0) - (this.lookKeys.up.isDown ? 1 : 0),
+      };
+    }
     if (this.letterKeys) {
       for (const face of FACE_BUTTONS) {
         if (Phaser.Input.Keyboard.JustDown(this.letterKeys[face])) {
@@ -151,6 +173,7 @@ export class InputService {
 
     return {
       move: combineMoves(stick, dpad, keys),
+      look: combineMoves(rightStick, lookKeys),
       justPressed,
       anyJustPressed,
       keyboardUsed,

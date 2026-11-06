@@ -1,28 +1,19 @@
 import { expect, test, type Page } from '@playwright/test';
+import { boot, enterGame } from './helpers';
 
 // Viewport matches the game's 16:9 design, so page pixels equal game units.
 test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 
 const state = (page: Page) => page.evaluate(() => window.__knappis!.state!());
 
-async function boot(page: Page) {
-  await page.goto('/');
-  await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
-}
-
-async function enterGame(page: Page) {
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
-}
-
 test('the gear opens settings; speed and mode are saved and used by the game', async ({ page }) => {
   await boot(page);
   // Gear sits top-left on the start screen.
   await page.mouse.click(40, 40);
-  // Card is centred at (640, 380): speed pills on row y=320, mode pills on y=450
-  // (find 400, free 640, paint 880), Done at y=565.
-  await page.mouse.click(440, 320); // Slow
-  await page.mouse.click(640, 450); // Free play
+  // Card is centred at (640, 380): speed pills on row y=290, mode pills in two
+  // rows (find 480 / free 800 at y=420; paint 480 / lamp 800 at y=486), Done at y=600.
+  await page.mouse.click(440, 290); // Slow
+  await page.mouse.click(800, 420); // Free play
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('knappis.settings')))
     .toBe(JSON.stringify({ speed: 'slow', mode: 'free' }));
@@ -32,7 +23,7 @@ test('the gear opens settings; speed and mode are saved and used by the game', a
   await page.waitForTimeout(300);
   expect(await page.evaluate(() => window.__knappis?.scene)).toBe('Connect');
 
-  await page.mouse.click(640, 565); // Done
+  await page.mouse.click(640, 600); // Done
   await enterGame(page);
   const settings = await page.evaluate(() => window.__knappis!.settings!());
   expect(settings).toEqual({ mode: 'free', walkSpeed: 100 });

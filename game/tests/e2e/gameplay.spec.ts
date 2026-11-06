@@ -1,14 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
+import { boot, enterGame } from './helpers';
 
 test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 
 async function startGame(page: Page): Promise<string[]> {
   const errors: string[] = [];
   page.on('pageerror', (err) => errors.push(err.message));
-  await page.goto('/');
-  await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
+  await boot(page);
+  await enterGame(page);
   return errors;
 }
 

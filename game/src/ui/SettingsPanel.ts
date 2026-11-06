@@ -13,7 +13,7 @@ import { addText } from '../text';
 import { PillButton } from './PillButton';
 
 const CARD_W = 760;
-const CARD_H = 440;
+const CARD_H = 520;
 
 /**
  * Card with the grown-up choices: walking speed and game mode. Mouse and
@@ -49,11 +49,11 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     this.add(card);
 
     this.add(
-      addText(scene, 0, -180, strings.settingsTitle, { fontSize: '36px', fontStyle: 'bold' }),
+      addText(scene, 0, -210, strings.settingsTitle, { fontSize: '36px', fontStyle: 'bold' }),
     );
 
     this.add(
-      addText(scene, -CARD_W / 2 + 40, -112, strings.speedLabel, {
+      addText(scene, -CARD_W / 2 + 40, -142, strings.speedLabel, {
         fontSize: '24px',
         color: '#7a6a60',
       }).setOrigin(0, 0.5),
@@ -62,7 +62,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     this.speedPills = Object.fromEntries(
       WALK_SPEED_NAMES.map((speed) => [
         speed,
-        new PillButton(scene, speedXs[speed], -60, 180, 56, strings.speeds[speed], () =>
+        new PillButton(scene, speedXs[speed], -90, 180, 56, strings.speeds[speed], () =>
           this.apply({ speed }),
         ),
       ]),
@@ -70,26 +70,32 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     this.add(Object.values(this.speedPills));
 
     this.add(
-      addText(scene, -CARD_W / 2 + 40, 18, strings.modeLabel, {
+      addText(scene, -CARD_W / 2 + 40, -12, strings.modeLabel, {
         fontSize: '24px',
         color: '#7a6a60',
       }).setOrigin(0, 0.5),
     );
-    const modeXs: Record<GameMode, number> = { find: -240, free: 0, paint: 240 };
+    // Two rows of two, in the order the modes were added.
+    const modePos: Record<GameMode, { x: number; y: number }> = {
+      find: { x: -160, y: 40 },
+      free: { x: 160, y: 40 },
+      paint: { x: -160, y: 106 },
+      lamp: { x: 160, y: 106 },
+    };
     this.modePills = Object.fromEntries(
       GAME_MODES.map((mode) => [
         mode,
-        new PillButton(scene, modeXs[mode], 70, 224, 56, strings.modes[mode], () =>
+        new PillButton(scene, modePos[mode].x, modePos[mode].y, 300, 56, strings.modes[mode], () =>
           this.apply({ mode }),
         ),
       ]),
     ) as Record<GameMode, PillButton>;
     this.add(Object.values(this.modePills));
-    this.modeHint = addText(scene, 0, 122, '', { fontSize: '20px', color: '#7a6a60' });
+    this.modeHint = addText(scene, 0, 158, '', { fontSize: '20px', color: '#7a6a60' });
     this.add(this.modeHint);
 
     this.add(
-      new PillButton(scene, 0, 185, 200, 56, strings.done, () => this.close()).setSelected(true),
+      new PillButton(scene, 0, 220, 200, 56, strings.done, () => this.close()).setSelected(true),
     );
 
     this.refresh();

@@ -4,6 +4,8 @@ import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { setDebug } from '../debug';
 import type { FaceButton } from '../input/buttons';
 import { InputService } from '../input/InputService';
+import { Dusk, HALO_RADIUS } from '../entities/Dusk';
+import { Fireflies } from '../entities/Fireflies';
 import { Footprints } from '../entities/Footprints';
 import { Knappis } from '../entities/Knappis';
 import { PaintCanvas } from '../entities/PaintCanvas';
@@ -40,7 +42,8 @@ const PAD_SPREAD = 182;
  * about what counts as correct live in the rules object, which is picked
  * from the settings: "find the button" asks for one pad at a time, "free
  * play" lets any pad count, "paint" has no pads and every press leaves a
- * splat of the button's colour where Knappis stands.
+ * splat of the button's colour where Knappis stands, "lamp" darkens the
+ * room and the right stick points a beam that lights up fireflies.
  */
 export class PlayScene extends Phaser.Scene {
   private theme: SymbolTheme = xboxTheme;
@@ -65,6 +68,10 @@ export class PlayScene extends Phaser.Scene {
   private paint: PaintCanvas | null = null;
   private footprints: Footprints | null = null;
   private drops: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+  /** Lamp mode only: the dusk with its beam, the fireflies, where the beam points. */
+  private dusk: Dusk | null = null;
+  private fireflies: Fireflies | null = null;
+  private lookAngle = 0;
 
   constructor() {
     super('Play');
@@ -85,6 +92,7 @@ export class PlayScene extends Phaser.Scene {
     this.drawRoom();
     this.buildHud();
     this.buildPaintFloor();
+    this.buildLampRoom();
 
     this.tiles = this.rules.state.tiles.map((face) => {
       const off = this.theme.layout[face];
@@ -183,6 +191,30 @@ export class PlayScene extends Phaser.Scene {
     this.drops.setDepth(9);
   }
 
+  /**
+   * Lamp mode: fireflies over the floor, dusk over everything in the room
+   * (above Knappis too, whose depth is his y; the halo keeps him visible),
+   * and the lit fireflies drawn above the dusk so they shine. The sound
+   * toggle in the corner is lifted above the dusk as well.
+   */
+  private buildLampRoom(): void {
+    this.dusk = null;
+    this.fireflies = null;
+    this.lookAngle = 0;
+    if (this.mode !== 'lamp') return;
+    this.dusk = new Dusk(this, HUD_HEIGHT, GAME_WIDTH, GAME_HEIGHT - HUD_HEIGHT, 50);
+    // Keep fireflies off the far left so there is always room to stand west of one.
+    const area = new Phaser.Geom.Rectangle(
+      ROOM.left + 200,
+      ROOM.top + 20,
+      ROOM.width - 260,
+      ROOM.height - 60,
+    );
+    this.fireflies = new Fireflies(this, this.time, () => this.sounds.firefly(), area, 12, 60);
+    this.soundToggle.setDepth(70);
+    this.diagram.setStep('look');
+  }
+
   private buildHud(): void {
     this.stars = new StarRow(this, 230, HUD_HEIGHT / 2, this.rules.state.starsPerRound);
 
@@ -232,13 +264,27 @@ export class PlayScene extends Phaser.Scene {
     this.knappis.setDepth(this.knappis.y);
     this.footprints?.update(this.knappis.x, this.knappis.y);
 
+    // Lamp: the beam follows the right stick and keeps its last direction
+    // when the stick is let go, so the light never "disappears".
+    if (this.dusk && this.fireflies) {
+      if (Math.hypot(frame.look.x, frame.look.y) > 0) {
+        this.lookAngle = Math.atan2(frame.look.y, frame.look.x);
+      }
+      this.diagram.setLook(frame.look.x, frame.look.y);
+      this.dusk.update(this.knappis.x, this.knappis.y - 30, this.lookAngle);
+      this.fireflies.update(
+        this.dusk.cone(this.knappis.x, this.knappis.y - 30, this.lookAngle),
+        HALO_RADIUS,
+      );
+    }
+
     this.updateStanding();
 
     // Teach in two steps: pulse the stick until Knappis is on the right
     // tile, then pulse the button. In free play the "right" tile is
     // whichever one Knappis stands on, so the pad in the corner follows.
     this.diagram.setStick(frame.move.x, frame.move.y);
-    if (!this.animating && this.rules.state.phase === 'playing') {
+    if (!this.animating && this.rules.state.phase === 'playing' && this.mode !== 'lamp') {
       if (this.mode === 'free') this.diagram.highlight(this.standingOn?.face ?? null);
       this.diagram.setStep(this.standingOn && this.isRight(this.standingOn) ? 'press' : 'move');
     }
@@ -284,6 +330,14 @@ export class PlayScene extends Phaser.Scene {
 
   private async render(e: RulesEvent): Promise<void> {
     switch (e.type) {
+      case 'flash': {
+        this.sounds.flash();
+        this.dusk?.flash();
+        this.diagram.highlight(e.button);
+        this.time.delayedCall(300, () => this.diagram.highlight(null));
+        void this.knappis.hop();
+        return;
+      }
       case 'paint': {
         const colour = this.theme.buttons[e.button].colour;
         this.sounds.paint(e.button);
@@ -434,6 +488,11 @@ export class PlayScene extends Phaser.Scene {
       paint: () => ({
         splats: this.paint?.splats ?? 0,
         footprints: this.footprints?.count ?? 0,
+      }),
+      lamp: () => ({
+        angle: this.lookAngle,
+        lit: this.fireflies?.litCount ?? 0,
+        fireflies: this.fireflies?.positions ?? [],
       }),
     });
   }

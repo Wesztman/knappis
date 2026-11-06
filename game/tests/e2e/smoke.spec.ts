@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { boot, enterGame } from './helpers';
 
 // Mimic a typical laptop: 150% Windows scaling on a 1920x1080 display.
 test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 });
@@ -34,10 +35,8 @@ test('game boots to the connect screen without console errors', async ({ page })
 
 test('a key press starts the game', async ({ page }) => {
   const errors = collectErrors(page);
-  await page.goto('/');
-  await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
+  await boot(page);
+  await enterGame(page);
   await page.waitForTimeout(400);
   await page.screenshot({ path: 'test-results/play.png' });
   expect(errors).toEqual([]);

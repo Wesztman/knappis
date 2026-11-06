@@ -12,8 +12,9 @@ and press the matching button on the pad.
 **Status:** first edition (v1.0.0) plus the first playtest's fixes. Walk
 Knappis onto the glowing pad and press the matching button; one star per
 button, four stars complete a round. A gear on the start screen sets walking speed and picks
-"find the button", "free play" or "paint" (no pads: each button splats its
-colour on the floor). See [`docs/ROADMAP.md`](docs/ROADMAP.md)
+"find the button", "free play", "paint" (no pads: each button splats its
+colour on the floor) or "lamp" (evening in the room: the right stick points
+a beam and fireflies light up in it). See [`docs/ROADMAP.md`](docs/ROADMAP.md)
 and [`docs/PLAYTESTS.md`](docs/PLAYTESTS.md).
 
 - [Design](docs/DESIGN.md) · [Roadmap](docs/ROADMAP.md) · [Tech](docs/TECH.md)

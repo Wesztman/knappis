@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { boot, enterGame } from './helpers';
 
 test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 
@@ -8,10 +9,8 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() =>
     localStorage.setItem('knappis.settings', JSON.stringify({ speed: 'fast', mode: 'paint' })),
   );
-  await page.goto('/');
-  await expect(page.locator('#game canvas')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
+  await boot(page);
+  await enterGame(page);
 });
 
 test('paint mode has no pads; every button press leaves a splat', async ({ page }) => {
@@ -41,7 +40,6 @@ test('going home and back starts with a clean sheet', async ({ page }) => {
   await expect.poll(async () => (await paint(page)).splats).toBe(1);
   await page.mouse.click(40, 40); // home
   await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Connect');
-  await page.keyboard.press('Enter');
-  await expect.poll(() => page.evaluate(() => window.__knappis?.scene)).toBe('Play');
+  await enterGame(page);
   expect((await paint(page)).splats).toBe(0);
 });

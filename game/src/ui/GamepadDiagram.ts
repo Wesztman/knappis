@@ -6,7 +6,7 @@ import { addText } from '../text';
 import { FACE_CENTRE, FACE_SPREAD, GAMEPAD_SILHOUETTE } from './gamepadSilhouette';
 
 /** Which part of the pad the child should use next. */
-export type Step = 'move' | 'press';
+export type Step = 'move' | 'press' | 'look';
 
 /**
  * Positions in the pad's local space (256 wide, centred), measured from the
@@ -37,6 +37,8 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
   private readonly glow: Phaser.GameObjects.Arc;
   private readonly stickGlow: Phaser.GameObjects.Arc;
   private readonly stickCap: Phaser.GameObjects.Arc;
+  private readonly rightGlow: Phaser.GameObjects.Arc;
+  private readonly rightCap: Phaser.GameObjects.Arc;
   private pulse: Phaser.Tweens.Tween | null = null;
   private stickPulse: Phaser.Tweens.Tween | null = null;
   private current: FaceButton | null = null;
@@ -62,17 +64,17 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
 
     this.stickGlow = scene.add.circle(STICK.x, STICK.y, 23, 0xffffff, 0.9).setVisible(false);
     this.add(this.stickGlow);
+    this.rightGlow = scene.add
+      .circle(RIGHT_STICK.x, RIGHT_STICK.y, 23, 0xffffff, 0.9)
+      .setVisible(false);
+    this.add(this.rightGlow);
 
     const details = scene.add.graphics();
     // Left stick well
     details.fillStyle(WELL, 1);
     details.fillCircle(STICK.x, STICK.y, 17);
-    // Right stick
+    // Right stick well (its cap is a separate object so it can move too)
     details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 17);
-    details.fillStyle(CAP, 1);
-    details.fillCircle(RIGHT_STICK.x, RIGHT_STICK.y, 12);
-    details.lineStyle(2, CAP_EDGE, 1);
-    details.strokeCircle(RIGHT_STICK.x, RIGHT_STICK.y, 12);
     // D-pad: round dish with a cross
     details.fillStyle(WELL, 1);
     details.fillCircle(DPAD.x, DPAD.y, 18);
@@ -93,6 +95,9 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     this.stickCap = scene.add.circle(STICK.x, STICK.y, 12, CAP);
     this.stickCap.setStrokeStyle(2, CAP_EDGE, 1);
     this.add(this.stickCap);
+    this.rightCap = scene.add.circle(RIGHT_STICK.x, RIGHT_STICK.y, 12, CAP);
+    this.rightCap.setStrokeStyle(2, CAP_EDGE, 1);
+    this.add(this.rightCap);
 
     this.glow = scene.add.circle(0, 0, FACE_RADIUS + 5, 0xffffff, 0.9).setVisible(false);
     this.add(this.glow);
@@ -126,8 +131,9 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
   }
 
   /**
-   * Which step the child is on. 'move' pulses the stick and keeps the
-   * button lit but calm; 'press' pulses the button.
+   * Which step the child is on. 'move' pulses the left stick and keeps the
+   * button lit but calm; 'press' pulses the button; 'look' pulses the
+   * right stick (lamp mode).
    */
   setStep(step: Step): void {
     if (step === this.step) return;
@@ -135,10 +141,16 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     this.applyHighlights();
   }
 
-  /** Mirror the real stick (x, y in -1..1). */
+  /** Mirror the real left stick (x, y in -1..1). */
   setStick(x: number, y: number): void {
     this.stickCap.setPosition(STICK.x + x * STICK_TRAVEL, STICK.y + y * STICK_TRAVEL);
     this.stickGlow.setPosition(this.stickCap.x, this.stickCap.y);
+  }
+
+  /** Mirror the real right stick (x, y in -1..1). */
+  setLook(x: number, y: number): void {
+    this.rightCap.setPosition(RIGHT_STICK.x + x * STICK_TRAVEL, RIGHT_STICK.y + y * STICK_TRAVEL);
+    this.rightGlow.setPosition(this.rightCap.x, this.rightCap.y);
   }
 
   private applyHighlights(): void {
@@ -147,8 +159,24 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
     this.stickPulse?.stop();
     this.stickPulse = null;
     this.stickGlow.setVisible(false).setScale(1);
+    this.rightGlow.setVisible(false).setScale(1);
     const face = this.current;
     for (const b of FACE_BUTTONS) this.buttonNodes[b].setScale(1).setAlpha(face ? 0.55 : 1);
+
+    if (this.step === 'look') {
+      this.glow.setVisible(false);
+      this.rightGlow.setVisible(true);
+      this.stickPulse = this.scene.tweens.add({
+        targets: this.rightGlow,
+        scale: { from: 0.9, to: 1.15 },
+        alpha: { from: 0.9, to: 0.5 },
+        duration: 420,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+      return;
+    }
 
     if (!face) {
       this.glow.setVisible(false);

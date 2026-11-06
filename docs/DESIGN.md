@@ -108,12 +108,34 @@ prints that fade out over a few seconds. They give the stick feedback
 before any button is pressed. Paint mode only for now, to see whether they
 distract from the lessons before they spread to other modes.
 
+## Lamp (shipped, step one)
+
+The first mode for the right stick, which in real games means "where I
+look" while the left stick means "where I go". Evening falls over the room
+(night blue, not black) and Knappis holds a lamp. The right stick points
+the beam; let go and it stays where it was, so the light never vanishes
+under a lifted thumb. Knappis always stands in a small pool of light.
+
+Fireflies drift about the dusk, winking faintly so the child knows
+something is out there. Caught in the beam they light up fully with a
+twinkle and stay lit a moment after it moves on. Any button flares the
+lamp wider for an instant, so pressing always does something. The gamepad
+in the corner pulses the right stick.
+
+Small children cannot steer two thumbs at once, so nothing here needs
+both sticks together: stand still and sweep the light, then walk, then
+sweep again.
+
+Planned step two: the floor pads hidden in the dark, visible only in the
+beam. Light one up, walk to it, press its button: the Find the button
+loop with the right stick added on top.
+
 ## Settings (grown-ups only)
 
 A gear on the start screen opens a card with mouse-only choices, remembered
 per browser: walking speed (slow / normal / fast; a 3-year-old found the
 original speed too fast) and game mode (find the button / free play /
-paint). A home
+paint / lamp). A home
 button in the room returns to the start screen. The gamepad never operates
 the settings: it stays the child's.
 
@@ -124,6 +146,7 @@ the settings: it stays the child's.
 | 0. Free play | stick + matching pad to button | shipped, see above |
 | 1. Hitta knappen | stick + 4 face buttons | described above |
 | Paint | stick + buttons as colours | shipped, see above |
+| Lamp | right stick = where you look | step one shipped, see above |
 | 2. Två i rad | sequence memory | two symbols shown, press in order (Simon-lite) |
 | 3. Axlarna | shoulder buttons / triggers | tiles for LB/RB, LT/RT |
 | 4. Hoppa | jump timing | press A to hop over a slow-rolling ball |
