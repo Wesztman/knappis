@@ -1,7 +1,7 @@
 import type { GameMode } from '../settings';
 import { FindTheButton } from './FindTheButton';
 import { FreePlay } from './FreePlay';
-import { Lamp } from './Lamp';
+import { Flashlight } from './Flashlight';
 import { Paint } from './Paint';
 import type { Rules } from './types';
 
@@ -14,7 +14,7 @@ export function createRules(mode: GameMode): Rules {
       return new FindTheButton();
     case 'paint':
       return new Paint();
-    case 'lamp':
-      return new Lamp();
+    case 'flashlight':
+      return new Flashlight();
   }
 }

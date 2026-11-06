@@ -20,7 +20,7 @@ export interface PadInfo {
 export interface InputFrame {
   /** Movement direction (left stick, D-pad, arrow keys), length 0..1. */
   move: Vec2;
-  /** Look direction (right stick, I J K L keys), length 0..1. Lamp mode. */
+  /** Look direction (right stick, I J K L keys), length 0..1. Flashlight mode. */
   look: Vec2;
   /** Face buttons that went down this frame. */
   justPressed: FaceButton[];

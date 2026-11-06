@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
 
+/** From the body centre to the flashlight lens. */
+const FLASHLIGHT_LENGTH = 80;
+
 /**
  * Knappis: a round little button with eyes and stubby legs.
  * Drawn entirely in code so the game is playable before any art exists.
@@ -11,6 +14,7 @@ export class Knappis extends Phaser.GameObjects.Container {
   private readonly legL: Phaser.GameObjects.Graphics;
   private readonly legR: Phaser.GameObjects.Graphics;
   private readonly shadow: Phaser.GameObjects.Ellipse;
+  private readonly flashlight: Phaser.GameObjects.Container;
   private walkPhase = 0;
   private facing = 1;
   private busy = false;
@@ -52,7 +56,51 @@ export class Knappis extends Phaser.GameObjects.Container {
     this.face.add(eyes);
     this.torso.add(this.face);
 
+    this.flashlight = this.makeFlashlight(scene);
+    this.torso.add(this.flashlight);
+
     this.add(this.torso);
+  }
+
+  /** Where the flashlight's lens is, in world space. */
+  get flashlightTip(): { x: number; y: number } {
+    const r = this.flashlight.rotation;
+    return {
+      x: this.x + this.torso.x + Math.cos(r) * FLASHLIGHT_LENGTH,
+      y: this.y + this.torso.y + Math.sin(r) * FLASHLIGHT_LENGTH,
+    };
+  }
+
+  /** Show the flashlight pointing this way (radians), or hide it with null. */
+  setFlashlight(angle: number | null): void {
+    this.flashlight.setVisible(angle !== null);
+    if (angle !== null) this.flashlight.setRotation(angle);
+  }
+
+  /**
+   * A little torch held out from the body, drawn pointing right and
+   * rotated as a whole. Sits inside the torso so it bobs along with it.
+   */
+  private makeFlashlight(scene: Phaser.Scene): Phaser.GameObjects.Container {
+    const lamp = scene.add.container(0, 0).setVisible(false);
+    const g = scene.add.graphics();
+    // Hand on the body edge
+    g.fillStyle(0xff8a65, 1);
+    g.fillCircle(46, 0, 11);
+    g.lineStyle(5, 0x3a2e2a, 1);
+    g.strokeCircle(46, 0, 11);
+    // Handle, then the wider head
+    g.fillStyle(0x3a2e2a, 1);
+    g.fillRoundedRect(40, -8, 30, 16, 6);
+    g.fillStyle(0x5a5a62, 1);
+    g.fillRoundedRect(64, -12, 16, 24, 4);
+    g.lineStyle(3, 0x3a2e2a, 1);
+    g.strokeRoundedRect(64, -12, 16, 24, 4);
+    // Lens
+    g.fillStyle(0xfff1a8, 1);
+    g.fillRect(77, -9, 5, 18);
+    lamp.add(g);
+    return lamp;
   }
 
   private makeLeg(scene: Phaser.Scene, x: number): Phaser.GameObjects.Graphics {

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { BEAM_HALF_ANGLE, BEAM_RADIUS } from '../entities/Dusk';
 
 /** Generates the few textures the game needs, then hands over. */
 export class BootScene extends Phaser.Scene {
@@ -39,22 +40,22 @@ export class BootScene extends Phaser.Scene {
     foot.generateTexture('footprint', 14, 22);
     foot.destroy();
 
-    this.makeLampTextures();
+    this.makeFlashlightTextures();
 
     this.scene.start('Connect');
   }
 
   /**
-   * Lamp mode erases these out of the dusk. Both are white with soft
-   * edges, made with canvas gradients since Phaser graphics have no
-   * gradients: 'cone' is a wedge pointing right, 'halo' a round pool.
+   * Flashlight mode textures, white with soft edges, made with canvas gradients
+   * since Phaser graphics have no gradients: 'cone' is the beam (a wedge
+   * pointing right, erased out of the dusk), 'halo' the fireflies' glow.
    */
-  private makeLampTextures(): void {
-    const R = 340;
+  private makeFlashlightTextures(): void {
+    const R = BEAM_RADIUS;
     const cone = this.textures.createCanvas('cone', R * 2, R * 2);
     const ctx = cone?.getContext();
     if (cone && ctx) {
-      const half = Phaser.Math.DegToRad(32);
+      const half = BEAM_HALF_ANGLE;
       const fade = ctx.createRadialGradient(R, R, 0, R, R, R);
       fade.addColorStop(0, 'rgba(255,255,255,1)');
       fade.addColorStop(0.55, 'rgba(255,255,255,0.85)');

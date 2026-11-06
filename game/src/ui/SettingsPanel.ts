@@ -80,7 +80,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
       find: { x: -160, y: 40 },
       free: { x: 160, y: 40 },
       paint: { x: -160, y: 106 },
-      lamp: { x: 160, y: 106 },
+      flashlight: { x: 160, y: 106 },
     };
     this.modePills = Object.fromEntries(
       GAME_MODES.map((mode) => [

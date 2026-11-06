@@ -92,14 +92,14 @@ export class Sounds {
     this.tone(f * 1.25, 0.2, 0.16, 'triangle', 0, f);
   }
 
-  /** Lamp mode: a firefly lights up. A random high pentatonic twinkle. */
+  /** Flashlight mode: a firefly lights up. A random high pentatonic twinkle. */
   firefly(): void {
     const notes = [1046.5, 1174.66, 1318.51, 1567.98, 1760];
     const f = notes[Math.floor(Math.random() * notes.length)] ?? 1046.5;
     this.tone(f, 0.3, 0.09, 'sine');
   }
 
-  /** Lamp mode: the lamp flares. A quick rising swoosh. */
+  /** Flashlight mode: the lamp flares. A quick rising swoosh. */
   flash(): void {
     this.tone(392, 0.18, 0.1, 'triangle', 0, 784);
   }

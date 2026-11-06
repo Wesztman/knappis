@@ -1,6 +1,6 @@
 # Knappis
 
-*Knappis, the little button*
+_Knappis, the little button_
 
 A friendly 2D browser game that teaches young children how to use a gamepad. Walk a little button-creature onto a symbol on the floor
 and press the matching button on the pad.
@@ -13,7 +13,7 @@ and press the matching button on the pad.
 Knappis onto the glowing pad and press the matching button; one star per
 button, four stars complete a round. A gear on the start screen sets walking speed and picks
 "find the button", "free play", "paint" (no pads: each button splats its
-colour on the floor) or "lamp" (evening in the room: the right stick points
+colour on the floor) or "flashlight" (evening in the room: the right stick points
 a beam and fireflies light up in it). See [`docs/ROADMAP.md`](docs/ROADMAP.md)
 and [`docs/PLAYTESTS.md`](docs/PLAYTESTS.md).
 

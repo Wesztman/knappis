@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { angleDiff, inCone, type Cone } from '../../../src/rules/cone';
+import { angleDiff, approachAngle, inCone, type Cone } from '../../../src/rules/cone';
 
 const beam: Cone = {
   origin: { x: 100, y: 100 },
@@ -15,6 +15,22 @@ describe('angleDiff', () => {
   });
 });
 
+describe('approachAngle', () => {
+  it('takes the given share of the remaining turn', () => {
+    expect(approachAngle(0, 1, 0.5)).toBeCloseTo(0.5);
+    expect(approachAngle(0, 1, 1)).toBeCloseTo(1);
+    expect(approachAngle(0, 1, 0)).toBeCloseTo(0);
+  });
+
+  it('turns the short way round the wrap', () => {
+    // From 170 degrees to -170 degrees is a 20 degree turn, not 340.
+    const from = (170 * Math.PI) / 180;
+    const to = (-170 * Math.PI) / 180;
+    const next = approachAngle(from, to, 0.5);
+    expect(angleDiff(next, from)).toBeCloseTo((10 * Math.PI) / 180);
+  });
+});
+
 describe('inCone', () => {
   it('lights a point straight ahead within reach', () => {
     expect(inCone(beam, { x: 250, y: 100 })).toBe(true);
@@ -24,7 +40,7 @@ describe('inCone', () => {
     expect(inCone(beam, { x: 350, y: 100 })).toBe(false);
   });
 
-  it('does not light a point behind the lamp', () => {
+  it('does not light a point behind the flashlight', () => {
     expect(inCone(beam, { x: 50, y: 100 })).toBe(false);
   });
 

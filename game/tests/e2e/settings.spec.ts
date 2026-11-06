@@ -11,7 +11,7 @@ test('the gear opens settings; speed and mode are saved and used by the game', a
   // Gear sits top-left on the start screen.
   await page.mouse.click(40, 40);
   // Card is centred at (640, 380): speed pills on row y=290, mode pills in two
-  // rows (find 480 / free 800 at y=420; paint 480 / lamp 800 at y=486), Done at y=600.
+  // rows (find 480 / free 800 at y=420; paint 480 / flashlight 800 at y=486), Done at y=600.
   await page.mouse.click(440, 290); // Slow
   await page.mouse.click(800, 420); // Free play
   await expect

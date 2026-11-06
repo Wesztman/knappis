@@ -133,7 +133,7 @@ export class GamepadDiagram extends Phaser.GameObjects.Container {
   /**
    * Which step the child is on. 'move' pulses the left stick and keeps the
    * button lit but calm; 'press' pulses the button; 'look' pulses the
-   * right stick (lamp mode).
+   * right stick (flashlight mode).
    */
   setStep(step: Step): void {
     if (step === this.step) return;

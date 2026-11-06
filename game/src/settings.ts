@@ -8,12 +8,12 @@ const STORAGE_KEY = 'knappis.settings';
 export const WALK_SPEED_NAMES = ['slow', 'normal', 'fast'] as const;
 export type WalkSpeed = (typeof WALK_SPEED_NAMES)[number];
 
-export const GAME_MODES = ['find', 'free', 'paint', 'lamp'] as const;
+export const GAME_MODES = ['find', 'free', 'paint', 'flashlight'] as const;
 /**
  * find: one button is asked for at a time (the badge, the glowing pad).
  * free: nothing is asked for; walk onto any pad and press that pad's button.
  * paint: no pads at all; each button leaves a splat of its own colour.
- * lamp: evening in the room; the right stick points a lamp, fireflies light up in it.
+ * flashlight: evening in the room; the right stick points a flashlight, fireflies light up in it.
  */
 export type GameMode = (typeof GAME_MODES)[number];
 

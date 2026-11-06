@@ -2,15 +2,15 @@
 
 ## Stack
 
-| Concern | Choice | Why |
-|---------|--------|-----|
-| Engine | **Phaser 3** | Mature 2D browser engine, built-in Gamepad plugin, tweens, particles, audio. Huge example library. |
-| Language | **TypeScript** | Types catch mistakes early and let Claude reason about the code reliably. |
-| Bundler / dev server | **Vite** | Instant reload, zero config, works well from WSL. |
-| Unit tests | **Vitest** | Same config as Vite. Game rules live in plain TS so they can be tested without a browser. |
-| Browser tests | **Playwright** | Load the page, screenshot, assert no console errors. Claude can run this to verify its own changes. |
-| Lint / format | **ESLint + Prettier** | Keep the code boring and consistent. |
-| Package manager | **npm** | Already installed (Node 24, npm 11). |
+| Concern              | Choice                | Why                                                                                                 |
+| -------------------- | --------------------- | --------------------------------------------------------------------------------------------------- |
+| Engine               | **Phaser 3**          | Mature 2D browser engine, built-in Gamepad plugin, tweens, particles, audio. Huge example library.  |
+| Language             | **TypeScript**        | Types catch mistakes early and let Claude reason about the code reliably.                           |
+| Bundler / dev server | **Vite**              | Instant reload, zero config, works well from WSL.                                                   |
+| Unit tests           | **Vitest**            | Same config as Vite. Game rules live in plain TS so they can be tested without a browser.           |
+| Browser tests        | **Playwright**        | Load the page, screenshot, assert no console errors. Claude can run this to verify its own changes. |
+| Lint / format        | **ESLint + Prettier** | Keep the code boring and consistent.                                                                |
+| Package manager      | **npm**               | Already installed (Node 24, npm 11).                                                                |
 
 ## Why browser + WSL
 
@@ -99,13 +99,16 @@ interesting logic testable and lets the rendering be swapped later.
   Modes stay pure TypeScript and unit-tested. A mode with no pads returns
   an empty `tiles` list and `starsPerRound: 0`; the scene then draws no
   tiles and hides the star row.
-- Lamp mode is the one place the right stick is read: `InputFrame.look`
+- Flashlight mode is the one place the right stick is read: `InputFrame.look`
   (`pad.axes[2..3]`, keys I J K L as the keyboard stand-in). The dusk is a
   `RenderTexture` over the room (`src/entities/Dusk.ts`) filled with night
-  blue every frame; the beam and a halo around Knappis are then stamped
-  out of it with `erase: true`. The beam and halo textures are drawn at
-  boot with canvas radial gradients (Phaser graphics have no gradients),
-  which is what gives the beam its soft edges. "Is this firefly lit?" is
+  blue every frame; the beam is then stamped out of it with `erase: true`
+  from the tip of the flashlight Knappis holds (`Knappis.flashlightTip`).
+  Knappis and the fireflies sit above the dusk in depth. The beam and the
+  fireflies' glow textures are drawn at boot with canvas radial gradients
+  (Phaser graphics have no gradients), which gives the beam its soft
+  edges. The beam angle eases towards the stick (`approachAngle` in
+  `src/rules/cone.ts`) and ignores deflections under 0.4. "Is this firefly lit?" is
   pure geometry in `src/rules/cone.ts`, unit-tested.
 - Paint mode stamps splats into one `RenderTexture` (`src/entities/PaintCanvas.ts`)
   rather than keeping a game object per splat, so the painting never slows

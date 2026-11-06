@@ -79,6 +79,7 @@ theme so these can be added later without touching the game rules. Until
 then, a non-Xbox pad may work for movement but the pictures will be wrong.
 
 ## Gamepad mapping
+
 - Movement: left stick **and** D-pad both work; whichever the child grabs.
 - Dead zone generous (≈0.25) because small thumbs rest on the stick.
 - Keyboard fallback (arrow keys move, the letters A/B/X/Y press) so the game
@@ -108,18 +109,21 @@ prints that fade out over a few seconds. They give the stick feedback
 before any button is pressed. Paint mode only for now, to see whether they
 distract from the lessons before they spread to other modes.
 
-## Lamp (shipped, step one)
+## Flashlight (shipped, step one)
 
 The first mode for the right stick, which in real games means "where I
 look" while the left stick means "where I go". Evening falls over the room
-(night blue, not black) and Knappis holds a lamp. The right stick points
+(night blue, not black) and Knappis holds a flashlight. The right stick points
 the beam; let go and it stays where it was, so the light never vanishes
-under a lifted thumb. Knappis always stands in a small pool of light.
+under a lifted thumb. Knappis is drawn above the dusk, so he never
+vanishes into it; the beam starts at the flashlight in his hand. The
+beam swings towards the stick rather than snapping, and tiny deflections
+are ignored, so a twitchy stick gives a calm light.
 
 Fireflies drift about the dusk, winking faintly so the child knows
 something is out there. Caught in the beam they light up fully with a
 twinkle and stay lit a moment after it moves on. Any button flares the
-lamp wider for an instant, so pressing always does something. The gamepad
+flashlight wider for an instant, so pressing always does something. The gamepad
 in the corner pulses the right stick.
 
 Small children cannot steer two thumbs at once, so nothing here needs
@@ -135,22 +139,22 @@ loop with the right stick added on top.
 A gear on the start screen opens a card with mouse-only choices, remembered
 per browser: walking speed (slow / normal / fast; a 3-year-old found the
 original speed too fast) and game mode (find the button / free play /
-paint / lamp). A home
+paint / flashlight). A home
 button in the room returns to the start screen. The gamepad never operates
 the settings: it stays the child's.
 
 ## Progression of modes (later)
 
-| Mode | Teaches | Idea |
-|------|---------|------|
-| 0. Free play | stick + matching pad to button | shipped, see above |
-| 1. Hitta knappen | stick + 4 face buttons | described above |
-| Paint | stick + buttons as colours | shipped, see above |
-| Lamp | right stick = where you look | step one shipped, see above |
-| 2. Två i rad | sequence memory | two symbols shown, press in order (Simon-lite) |
-| 3. Axlarna | shoulder buttons / triggers | tiles for LB/RB, LT/RT |
-| 4. Hoppa | jump timing | press A to hop over a slow-rolling ball |
-| 5. Tillsammans | two players | second pad joins, co-op tiles |
+| Mode             | Teaches                        | Idea                                           |
+| ---------------- | ------------------------------ | ---------------------------------------------- |
+| 0. Free play     | stick + matching pad to button | shipped, see above                             |
+| 1. Hitta knappen | stick + 4 face buttons         | described above                                |
+| Paint            | stick + buttons as colours     | shipped, see above                             |
+| Flashlight       | right stick = where you look   | step one shipped, see above                    |
+| 2. Två i rad     | sequence memory                | two symbols shown, press in order (Simon-lite) |
+| 3. Axlarna       | shoulder buttons / triggers    | tiles for LB/RB, LT/RT                         |
+| 4. Hoppa         | jump timing                    | press A to hop over a slow-rolling ball        |
+| 5. Tillsammans   | two players                    | second pad joins, co-op tiles                  |
 
 ## Art & audio direction
 

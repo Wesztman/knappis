@@ -20,7 +20,7 @@ export type RulesEvent =
   | { type: 'correct'; button: FaceButton; stars: number }
   /** Paint mode: leave a splat of this button's colour where Knappis stands. */
   | { type: 'paint'; button: FaceButton; splats: number }
-  /** Lamp mode: any button flares the lamp wider for a moment. */
+  /** Flashlight mode: any button flares the lamp wider for a moment. */
   | { type: 'flash'; button: FaceButton }
   /** Right pad, wrong button. `target` is the button that was wanted. */
   | { type: 'wrongButton'; standingOn: FaceButton; pressed: FaceButton; target: FaceButton }

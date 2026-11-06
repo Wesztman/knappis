@@ -4,19 +4,18 @@ import type { Cone } from '../rules/cone';
 /** Night-blue dusk over the room; dark enough to hide, not scary. */
 const DUSK_COLOUR = 0x1a2140;
 const DUSK_ALPHA = 0.82;
-/** The beam, in pixels and radians. Matches the 'cone' texture from BootScene. */
-export const BEAM_RADIUS = 340;
-export const BEAM_HALF_ANGLE = Phaser.Math.DegToRad(32);
-/** Knappis always stands in a little pool of light so the child never loses him. */
-export const HALO_RADIUS = 80;
+/** The beam, in pixels and radians. BootScene draws the 'cone' texture from these. */
+export const BEAM_RADIUS = 260;
+export const BEAM_HALF_ANGLE = Phaser.Math.DegToRad(24);
 const FLASH_SCALE = 1.35;
 const FLASH_MS = 320;
 
 /**
- * Lamp mode's darkness. One RenderTexture over the room is filled with
- * dusk every frame, then the beam and a halo around Knappis are erased
- * out of it. Erasing a pre-drawn soft texture (instead of drawing a
- * wedge) gives the beam feathered edges for free.
+ * Flashlight mode's darkness. One RenderTexture over the room is filled with
+ * dusk every frame, then the beam is erased out of it from the tip of the
+ * flashlight. Erasing a pre-drawn soft texture (instead of drawing a
+ * wedge) gives the beam feathered edges for free. Knappis himself is
+ * drawn above the dusk, so no pool of light is needed around him.
  */
 export class Dusk {
   private readonly texture: Phaser.GameObjects.RenderTexture;
@@ -52,7 +51,7 @@ export class Dusk {
     };
   }
 
-  /** Redraw: dusk everywhere, then cut out the beam and the halo. */
+  /** Redraw: dusk everywhere, then cut out the beam from (x, y). */
   update(x: number, y: number, angle: number): void {
     const scale = this.flashing ? FLASH_SCALE : 1;
     this.texture.fill(DUSK_COLOUR, DUSK_ALPHA);
@@ -61,6 +60,5 @@ export class Dusk {
       scale,
       erase: true,
     });
-    this.texture.stamp('halo', undefined, x, y - this.top, { erase: true });
   }
 }

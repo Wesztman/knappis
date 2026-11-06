@@ -60,7 +60,7 @@ export class Fireflies {
     return this.flies.filter((f) => f.litUntil > now).length;
   }
 
-  update(beam: Cone, haloRadius: number): void {
+  update(beam: Cone): void {
     const now = this.sceneTime.now;
     const t = now / 1000;
     for (const f of this.flies) {
@@ -68,9 +68,7 @@ export class Fireflies {
       f.x = f.homeX + Math.sin(t * 0.6 + f.phase) * 22;
       f.y = f.homeY + Math.cos(t * 0.45 + f.phase * 1.7) * 14;
 
-      const nearKnappis = Phaser.Math.Distance.Between(f.x, f.y, beam.origin.x, beam.origin.y);
-      const inLight = nearKnappis <= haloRadius || inCone(beam, f);
-      if (inLight) {
+      if (inCone(beam, f)) {
         if (f.litUntil <= now) this.onLight();
         f.litUntil = now + AFTERGLOW_MS;
       }

@@ -4,6 +4,7 @@ Each milestone ends with something playable in the browser. Tick boxes as
 they land. Keep this file honest: if a milestone changes, edit it here.
 
 ## M0 – Project skeleton ✅
+
 - [x] Vite + TypeScript + Phaser 3 project in `game/`
 - [x] `npm run dev` serves on `0.0.0.0` so the Windows browser can reach WSL
 - [x] Blank Phaser scene renders a coloured background and "Knappis" text
@@ -12,6 +13,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 - [x] Playwright smoke test: page loads, no console errors, canvas present
 
 ## M1 – Walk around ✅
+
 - [x] Knappis avatar drawn with Phaser graphics (circle + eyes + legs)
 - [x] `InputService`: unified movement vector from gamepad left stick, D-pad,
       and keyboard arrows, with dead zone
@@ -22,6 +24,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
       (keyboard dismisses it)
 
 ## M2 – Core loop ✅
+
 - [x] Four symbol tiles placed in the room (Xbox theme)
 - [x] Standing on a tile highlights it + soft sound
 - [x] One tile is "asked for" and pulses
@@ -32,6 +35,7 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 - [x] Unit tests for the game-rules state machine (pure TS, no Phaser)
 
 ## M3 – Polish for real kids
+
 - [x] Sound effects (generated WebAudio tones for now; CC0 samples later)
 - [x] Settings panel on the start screen: walking speed, game mode (remembered per browser)
 - [x] Home button in the room to get back to the start screen
@@ -42,15 +46,17 @@ they land. Keep this file honest: if a milestone changes, edit it here.
 - [ ] Onboarding hint: a thumb on the corner gamepad pushing the stick toward the target
 
 ## M4 – More modes
+
 - [x] Free play: no target, any pad counts, press that pad's button (asked for by the first tester)
 - [x] Paint: no pads, each button splats its colour on the floor; fading footprints while walking
-- [x] Lamp, step one: dusk, the right stick points a beam, fireflies light up in it
-- [ ] Lamp, step two: the pads hidden in the dark, found with the beam
+- [x] Flashlight, step one: dusk, the right stick points a beam, fireflies light up in it
+- [ ] Flashlight, step two: the pads hidden in the dark, found with the beam
 - [ ] Mode 2: two-in-a-row sequence
 - [ ] Mode 3: shoulder buttons & triggers
 - [ ] Mode select screen with pictures, no text
 
 ## Later / maybe
+
 - Two-player mode
 - Itch.io or GitHub Pages deploy
 - Real sprite art and a proper Knappis character sheet

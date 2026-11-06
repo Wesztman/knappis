@@ -4,12 +4,13 @@ import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { setDebug } from '../debug';
 import type { FaceButton } from '../input/buttons';
 import { InputService } from '../input/InputService';
-import { Dusk, HALO_RADIUS } from '../entities/Dusk';
+import { Dusk } from '../entities/Dusk';
 import { Fireflies } from '../entities/Fireflies';
 import { Footprints } from '../entities/Footprints';
 import { Knappis } from '../entities/Knappis';
 import { PaintCanvas } from '../entities/PaintCanvas';
 import { setupCamera } from '../render';
+import { approachAngle } from '../rules/cone';
 import { createRules } from '../rules/createRules';
 import type { Rules, RulesEvent } from '../rules/types';
 import { loadSettings, WALK_SPEEDS, type GameMode } from '../settings';
@@ -37,12 +38,19 @@ const ROOM = new Phaser.Geom.Rectangle(
 const PAD_CENTRE = { x: GAME_WIDTH / 2, y: 435 };
 const PAD_SPREAD = 182;
 
+/** Flashlight mode: Knappis sits above the dusk (depth 50), under the fireflies (60). */
+const KNAPPIS_FLASHLIGHT_DEPTH = 55;
+/** Right-stick deflection below this does not steer the flashlight (direction is noise). */
+const LOOK_MIN_DEFLECTION = 0.4;
+/** How fast the flashlight swings towards the stick, per second. Higher = snappier. */
+const LOOK_SWING = 7;
+
 /**
  * The room. Reads input, feeds the rules, renders events. All decisions
  * about what counts as correct live in the rules object, which is picked
  * from the settings: "find the button" asks for one pad at a time, "free
  * play" lets any pad count, "paint" has no pads and every press leaves a
- * splat of the button's colour where Knappis stands, "lamp" darkens the
+ * splat of the button's colour where Knappis stands, "flashlight" darkens the
  * room and the right stick points a beam that lights up fireflies.
  */
 export class PlayScene extends Phaser.Scene {
@@ -68,10 +76,11 @@ export class PlayScene extends Phaser.Scene {
   private paint: PaintCanvas | null = null;
   private footprints: Footprints | null = null;
   private drops: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
-  /** Lamp mode only: the dusk with its beam, the fireflies, where the beam points. */
+  /** Flashlight mode only: the dusk with its beam, the fireflies, where the beam points. */
   private dusk: Dusk | null = null;
   private fireflies: Fireflies | null = null;
   private lookAngle = 0;
+  private lookTarget = 0;
 
   constructor() {
     super('Play');
@@ -92,7 +101,6 @@ export class PlayScene extends Phaser.Scene {
     this.drawRoom();
     this.buildHud();
     this.buildPaintFloor();
-    this.buildLampRoom();
 
     this.tiles = this.rules.state.tiles.map((face) => {
       const off = this.theme.layout[face];
@@ -106,6 +114,7 @@ export class PlayScene extends Phaser.Scene {
     });
 
     this.knappis = new Knappis(this, PAD_CENTRE.x, PAD_CENTRE.y + 40);
+    this.buildFlashlightRoom();
 
     this.confetti = this.add.particles(0, 0, 'confetti', {
       speed: { min: 250, max: 650 },
@@ -192,16 +201,17 @@ export class PlayScene extends Phaser.Scene {
   }
 
   /**
-   * Lamp mode: fireflies over the floor, dusk over everything in the room
-   * (above Knappis too, whose depth is his y; the halo keeps him visible),
-   * and the lit fireflies drawn above the dusk so they shine. The sound
-   * toggle in the corner is lifted above the dusk as well.
+   * Flashlight mode: dusk over the room, Knappis and the fireflies drawn above
+   * it so he stays visible and they shine. The sound toggle in the corner
+   * is lifted above the dusk as well.
    */
-  private buildLampRoom(): void {
+  private buildFlashlightRoom(): void {
     this.dusk = null;
     this.fireflies = null;
     this.lookAngle = 0;
-    if (this.mode !== 'lamp') return;
+    this.lookTarget = 0;
+    this.knappis.setFlashlight(null);
+    if (this.mode !== 'flashlight') return;
     this.dusk = new Dusk(this, HUD_HEIGHT, GAME_WIDTH, GAME_HEIGHT - HUD_HEIGHT, 50);
     // Keep fireflies off the far left so there is always room to stand west of one.
     const area = new Phaser.Geom.Rectangle(
@@ -261,21 +271,27 @@ export class PlayScene extends Phaser.Scene {
       );
     }
     this.knappis.animate(delta, this.animating ? 0 : speed, frame.move.x);
-    this.knappis.setDepth(this.knappis.y);
+    this.knappis.setDepth(this.dusk ? KNAPPIS_FLASHLIGHT_DEPTH : this.knappis.y);
     this.footprints?.update(this.knappis.x, this.knappis.y);
 
-    // Lamp: the beam follows the right stick and keeps its last direction
-    // when the stick is let go, so the light never "disappears".
+    // Flashlight: the beam follows the right stick and keeps its last direction
+    // when the stick is let go, so the light never "disappears". Small
+    // deflections are ignored (their direction is noise) and the flashlight
+    // swings towards the stick rather than snapping, so it is not twitchy.
     if (this.dusk && this.fireflies) {
-      if (Math.hypot(frame.look.x, frame.look.y) > 0) {
-        this.lookAngle = Math.atan2(frame.look.y, frame.look.x);
+      if (Math.hypot(frame.look.x, frame.look.y) >= LOOK_MIN_DEFLECTION) {
+        this.lookTarget = Math.atan2(frame.look.y, frame.look.x);
       }
-      this.diagram.setLook(frame.look.x, frame.look.y);
-      this.dusk.update(this.knappis.x, this.knappis.y - 30, this.lookAngle);
-      this.fireflies.update(
-        this.dusk.cone(this.knappis.x, this.knappis.y - 30, this.lookAngle),
-        HALO_RADIUS,
+      this.lookAngle = approachAngle(
+        this.lookAngle,
+        this.lookTarget,
+        1 - Math.exp(-dt * LOOK_SWING),
       );
+      this.diagram.setLook(frame.look.x, frame.look.y);
+      this.knappis.setFlashlight(this.lookAngle);
+      const tip = this.knappis.flashlightTip;
+      this.dusk.update(tip.x, tip.y, this.lookAngle);
+      this.fireflies.update(this.dusk.cone(tip.x, tip.y, this.lookAngle));
     }
 
     this.updateStanding();
@@ -284,7 +300,7 @@ export class PlayScene extends Phaser.Scene {
     // tile, then pulse the button. In free play the "right" tile is
     // whichever one Knappis stands on, so the pad in the corner follows.
     this.diagram.setStick(frame.move.x, frame.move.y);
-    if (!this.animating && this.rules.state.phase === 'playing' && this.mode !== 'lamp') {
+    if (!this.animating && this.rules.state.phase === 'playing' && this.mode !== 'flashlight') {
       if (this.mode === 'free') this.diagram.highlight(this.standingOn?.face ?? null);
       this.diagram.setStep(this.standingOn && this.isRight(this.standingOn) ? 'press' : 'move');
     }
@@ -489,7 +505,7 @@ export class PlayScene extends Phaser.Scene {
         splats: this.paint?.splats ?? 0,
         footprints: this.footprints?.count ?? 0,
       }),
-      lamp: () => ({
+      flashlight: () => ({
         angle: this.lookAngle,
         lit: this.fireflies?.litCount ?? 0,
         fireflies: this.fireflies?.positions ?? [],

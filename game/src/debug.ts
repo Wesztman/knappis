@@ -14,8 +14,8 @@ export interface DebugApi {
   settings?: () => { mode: string; walkSpeed: number };
   /** Paint mode: how many splats and live footprints are on the floor. */
   paint?: () => { splats: number; footprints: number };
-  /** Lamp mode: where the beam points (radians), and the fireflies. */
-  lamp?: () => { angle: number; lit: number; fireflies: { x: number; y: number }[] };
+  /** Flashlight mode: where the beam points (radians), and the fireflies. */
+  flashlight?: () => { angle: number; lit: number; fireflies: { x: number; y: number }[] };
 }
 
 declare global {
